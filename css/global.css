@@ -1,0 +1,240 @@
+/* ====== reset ====== */
+html{color:#000;background:#FFF;}
+body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,code,form,fieldset,legend,input,textarea,p,blockquote,th,td{margin:0;padding:0;}
+table{border-collapse:collapse;border-spacing:0;}
+fieldset,img{border:0;}
+address,caption,cite,code,dfn,em,strong,th,var{font-style:normal;font-weight:normal;}
+li{list-style:none;}
+caption,th{text-align:left;}
+h1,h2,h3,h4,h5,h6{font-size:100%;font-weight:normal;}
+q:before,q:after{content:'';}
+abbr,acronym{border:0;font-variant:normal;}
+sup{vertical-align:text-top;}
+sub{vertical-align:text-bottom;}
+input,textarea,select{font-family:inherit;font-size:inherit;font-weight:inherit;}
+input,textarea,select{*font-size:100%;}
+legend{color:#000;}
+
+/* html5 elements */
+article,aside,footer,header,hgroup,menu,nav,section{display:block;}
+datalist{display:none;}
+
+
+/* ====== fonts ====== */
+body{font:13px/1.231 arial,helvetica,clean,sans-serif;*font-size:small;*font:x-small;}select,input,button,textarea{font:99% arial,helvetica,clean,sans-serif;}table{font-size:inherit;font:100%;}pre,code,kbd,samp,tt{font-family:monospace;*font-size:108%;line-height:100%;}
+
+
+/* ====== templates ====== */
+body{_text-align:center;}/* IE5.5 */
+.main{display:table-cell;*display:block;width:auto;}
+.body,.main{*zoom:1;}
+.body:after,.main:after{clear:both;display:block;visibility:hidden;overflow:hidden;height:0 !important;line-height:0;font-size:xx-large;content:" x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x ";}
+.page{margin:0 auto;width:960px;_text-align:left;}/* wraps other template elems to set width */ /* text-align IE5.5 */
+/* .liquid can extend page to allow for a liquid page width */
+.liquid{width:auto;margin:0;}
+
+/* columns */
+.left-col{float:left;width:175px;_margin-right:-3px;}
+.right-col{float:right;width:320px;_margin-left:-3px;}
+
+
+/* ====== grids ====== */
+.line:after,.lastUnit:after{clear:both;display:block;visibility:hidden;overflow:hidden;height:0 !important;line-height:0;font-size:xx-large;content:" x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x ";}
+.line{*zoom:1;}
+.unit{float:left;}
+.size1of1{float:none;}
+.size1of2{width:50%;}
+.size1of3{width:33.33333%;}
+.size2of3{width:66.66666%;}
+.size1of4{width:25%;}
+.size3of4{width:75%;}
+.size1of5{width:20%;}
+.size2of5{width:40%;}
+.size3of5{width:60%;}
+.size4of5{width:80%;}
+.lastUnit{display:table-cell;float:none;width:auto;*display:block;*zoom:1;_position:relative;_left:-3px;_margin-right:-3px;}
+
+
+/* ====== modules ====== */
+/* mod */
+.mod{margin:10px;}
+.mod .inner{/*background:url(skin/transparent.png) repeat left top;*/}
+.hd,.bd,.ft{overflow:hidden;_overflow:visible;_zoom:1;}
+.inner{position:relative;}
+b{display:block;background-repeat:no-repeat;font-size:1%;position:relative;z-index:10;}
+.tl, .tr, .bl, .br{height:10px;width:10px;float:left;}
+.tl{background-position:left top;}
+.tr{background-position:right top;}
+.bl{background-position:left bottom;}
+.br{background-position:right bottom;}
+.br,.tr{float:right;}
+.tr, .tl{overflow:hidden;margin-bottom:-32000px;}/* margin bottom needs to be < -9px */
+.bl,.br{margin-top:-10px;}
+.top{background-position:center top;}
+.bottom{background-position:center bottom;_zoom:1;}/* this zoom required for IE5.5 only*/
+
+/* complex */
+.complex{overflow:hidden;*position:relative;*zoom:1;}/* position/zoom required for IE7, 6, 5.5 */
+.complex .tl, .complex .tr{height:32000px;margin-bottom:-32000px;width:10px;}
+.complex .bl, .complex .br{/*margin-top:0;*/}
+.complex .top{height:5px;}
+.complex .bottom{height:5px;/*margin-top:-10px;*/}
+
+/* pop */
+.pop{overflow:visible;margin:10px 20px 20px 10px;background-position:left top;}
+.pop .inner{right:-10px;bottom:-10px;background-position:right bottom;padding:0 10px 10px 0;}
+.pop .tl, .pop .br{display:none;}
+.pop .bl{bottom:-10px;}
+.pop .tr{right:-10px;}
+
+
+/* ====== module skins ====== */
+
+/* ----- noted (extends mod) ----- */
+.noted,.noted .inner{border:1px solid #c2c2c2;/*-moz-border-radius: 5px;-webkit-border-radius: 5px;border-radius: 5px;*/}
+.noted .inner{border-color:#eded68;}
+.noted b{background-image:url(../i/noted.png);}
+.noted .tl{left:-1px;top:-1px;}
+.noted .tr{right:-1px;top:-1px;}
+.noted .bl{left:-1px;bottom:-1px;}
+.noted .br{right:-1px;bottom:-1px;}
+
+
+/* ====== default spacing ====== */
+h1, h2, h3, h4, h5, h6, ul, ol,dl, p,blockquote{padding:10px;}
+h1, h2, h3, h4, h5, h6,img{padding-bottom:0;}
+pre{margin:10px;}
+table h1,table h2,table h3, table h4, table h5, table h6, table p, table ul, table ol, table dl{padding:0;}
+
+
+/* ====== Elements ====== */
+img{display:block;}
+em{font-style:italic;}
+strong{font-weight:bold;}
+hr{border:2px solid #e2e2e2;border-width:0 0 2px 0;margin:20px 10px 10px 10px;}
+code{color:#0B8C8F;}
+
+
+/* ====== headings ====== */
+/* .h1-.h6 classes should be used to maintain the semantically appropriate heading levels - NOT for use on non-headings */
+h1, .h1{font-size:196%;font-weight:normal;font-style:normal;color:#212121;}
+h2, .h2{font-size:167%;font-weight:normal;font-style:normal;color:#212121;}
+h3, .h3{font-size:146.5%;font-weight:normal;font-style:normal;color:#212121;}
+h4, .h4{font-size:123.1%;font-weight:normal;font-style:normal;color:#212121;}
+h5, .h5{font-size:108%;font-weight:bold;font-style:normal;color:#212121;}
+h6, .h6{font-size:108%;font-weight:normal;font-style:italic;color:#212121;}
+/* if additional headings are needed they should be created via additional classes, never via location dependant styling */
+
+
+/* ====== links ======*/
+a{text-decoration:none;}
+a:focus, a:hover{text-decoration:underline;}
+
+
+/* ====== lists ======*/
+/* numbered */
+ol.simple-list li{list-style-type:decimal;margin-left:40px;}
+
+/* standard */
+ul.simple-list li{list-style-type:disc;margin-left:40px;}
+
+/* horizontal */
+.horizontal-list li{float:left;_display:inline;margin-left:20px;}
+.horizontal-list li.first{margin-left:0;}
+
+/* dropdown */
+.dropdown-list{position:relative;}
+/*
+	TODO change to dropdown-sub
+*/
+.dropdown-list ul.sub-list{display:none;position:absolute;left: 0;}
+.dropdown-list li:hover ul.sub-list{display:block;}
+
+/* ====== tables ====== */
+.data{padding:20px;position:relative;zoom:1;vertical-align:top;border-right:solid 1px transparent;/* border fixes a FF2 bug which causes the data table to overlay its borders*/}
+.data table{width:100%;border:1px solid #AE0345;}
+th, td{vertical-align:top;border:1px solid #AE0345;}
+
+.txt-c, .data .txt-c td, .data .txt-c th{text-align:center;}
+.txt-l, .data .txt-l td, .data .txt-l th{text-align:left;}
+.txt-r, .data .txt-r td, .data .txt-r th{text-align:right;}
+.txt-t, .data .txt-t td, .data .txt-t th{vertical-align:top;}
+.txt-b, .data .txt-b td, .data .txt-b th{vertical-align:bottom;}
+.txt-m, .data .txt-m td, .data .txt-m th{vertical-align:middle;}
+
+.data th,.data td{padding:3px 20px}
+.data thead tr{background-color:#fff0f8;}
+.data th{color:#000;font-weight:bold}
+
+/* specification table - extends data table */
+.spec{padding:10px;}
+.spec table{border-top:1px solid #e2e2e2;border-bottom-color:#fff;border-left:none;border-right:none;}
+.spec th, .spec td{border:1px solid #e2e2e2;border-width:1px 0;padding-left:0;}
+.spec .odd, .spec .even{background-color:#fff;}
+
+
+/* ====== blockquote ====== */
+cite{display:block;text-align:right;padding-top:10px;}
+
+
+/* ====== callout ====== */
+.callout{font-size:189%;color:#999;font-style:italic;}
+.callout cite{display:block;text-align:right;padding-top:30px;font-size:69.25%;}
+.callout span.quot{font-size:200%;vertical-align:sub;color:#e2e2e2;line-height:15px;font-weight:bold;}
+.callout span.quotLast{vertical-align:middle;}
+
+
+/* ====== media ====== */
+.media{zoom:1;margin:10px;}
+.media .img{float:left;margin-right:10px;}
+.media .img img{display:block;}
+.media .imgExt{float:right;margin-left:10px;}
+
+
+/* ====== background image classes ====== */
+
+
+/* ====== special formatting classes ====== */
+
+
+/* ====== utility ====== */
+.hide-offscreen{position:absolute;left:-9999em;top:-9999em;}
+.hide-textindent{text-indent:-9999em;display:block;overflow:hidden;}
+
+
+/* ====== specific layout styling ====== */
+#logo{float:right;margin:10px;}
+#logo img {
+	/*
+		TODO does ie7+ even support AlphaImageLoader? Can remove _ if they don't.
+	*/
+	_filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='../i/logo-website.png', sizingMethod='image');
+}
+
+
+/* ====== clearfix ====== */
+.page:after,.head:after,.body:after,.foot:after,.horizontal-list:after{content:".";display:block;height:0;clear:both;visibility:hidden;}
+.page,.head,.body,.foot,.horizontal-list{*zoom:1;}
+
+/* ====== Font size chart ====== */
+/*
+	PX      %%
+	----------
+	10      77
+	11      85
+	12      93
+	13      100
+	14      108
+	15      116
+	16      123.1
+	17      131
+	18      138.5
+	19      146.5
+	20      153.9
+	21      161.6
+	22      167
+	23      174
+	24      182
+	25      189
+	26      197
+*/
