@@ -129,14 +129,25 @@
 		<script type="text/javascript">
 			var thing = $('.transform').transform();
 			thing.click(function() {
-				$(this).animate({skew: '21 21'});
-			});
+				$(this).animate({
+					skew: '+=180deg +=180', //you don't have to use units
+					skewX: '+=5',
+					skewY: '+=5',
+					rotate: '+=360deg',
+					scale: '+=.1 +=.1',
+					scaleX: '+=.05',
+					scaleY: '+=.05',
+					translate: '+=10px -=10px',
+					translateX: '-=1',
+					translateY: '-=1'
+				}, 1500);
+			}).mouseenter(shake);
 			
-			function sproing() {
+			function shake() {
 				var thing  = $(this);
-				thing.animate({rotate: '5', skewX: '-5'}, 'fast', 'easeOutBack', function() {
-					thing.animate({rotate: '-5', skewX: '5'}, 'fast', 'easeOutBack', function() {
-						thing.animate({rotate: '0', skewX: '0'}, 'slow', 'easeOutElastic');
+				thing.animate({rotate: '+=2.5', skew: '-=2.5'}, 100, 'easeOutBack', function() {
+					thing.animate({rotate: '-=5', skew: '+=5'}, 200, 'easeOutBack', function() {
+						thing.animate({rotate: '+=2.5', skew: '-=2.5'}, 200, 'easeOutElastic');
 					});
 				});
 			}
