@@ -128,7 +128,8 @@
 		<script src="lib/jquery.transform.js"></script>
 		<script src="lib/form.js"></script>
 		<script type="text/javascript">
-			$('#target2').transform({origin: [0, 0]});
+			$('#target2').transform({skewX: 45, origin: [0, 0]}, {forceMatrix: true});
+			
 			var thing = $('.transform');
 			var i = 0;
 			thing.click(function() {
