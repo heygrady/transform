@@ -2,6 +2,16 @@ textarea {
 	width: 100%;
 	height: 10em;
 }
+section table th,
+section table td {
+	padding: 3px;
+	border-left: none;
+	border-right: none;
+}
+.right-col {
+	background-repeat: no-repeat;
+	background-position: 23px 58px;
+}
 .holder {
 	position: relative;
 	overflow: visible;
@@ -21,8 +31,8 @@ textarea {
 }
 
 .transform-ie {
-	-moz-transform-origin: top left;
+	/*-moz-transform-origin: top left;
 	-webkit-transform-origin: top left;
-	-o-transform-origin: top left;
-	position: absolute;
+	-o-transform-origin: top left;*/
+	position: relative;
 }

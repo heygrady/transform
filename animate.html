@@ -34,6 +34,7 @@
 				</aside>
 				<section class="main">
 					<div class="line">
+						<ul id="ie-barf"></ul>
 						<div class="unit size1of2">
 							<form id="transform" name="transform" action="">
 								<div class="line">
@@ -127,21 +128,28 @@
 		<script src="lib/sylvester-0.1.3.min.js"></script>
 		<script src="lib/transform.js"></script>
 		<script type="text/javascript">
-			var thing = $('.transform').transform();
+			$('#target2').transform({origin: [0, 0]});
+			var thing = $('.transform');
+			var i = 0;
 			thing.click(function() {
-				$(this).animate({
-					skew: '+=180deg +=180', //you don't have to use units
-					skewX: '+=5',
-					skewY: '+=5',
-					rotate: '+=360deg',
-					scale: '+=.1 +=.1',
-					scaleX: '+=.05',
-					scaleY: '+=.05',
-					translate: '+=10px -=10px',
-					translateX: '-=1',
-					translateY: '-=1'
-				}, 1500);
-			}).mouseenter(shake);
+				var $el = $(this);
+				$el.animate({rotate: '+=11.25deg'});
+			});
+			
+			$(document).keydown(function(e) {
+				var prop = {};
+				var pos = thing.position();
+				switch (e.which) {
+					case 40: prop.top = (pos.top + 1) + 'px';break;
+					case 38: prop.top = (pos.top - 1) + 'px';break;
+					case 39: prop.left = (pos.left + 1) + 'px';break;
+					case 37: prop.left = (pos.left - 1) + 'px';break;
+				}
+				if (!$.isEmptyObject(prop)) {
+					e.preventDefault();
+					thing.css(prop);
+				}
+			});
 			
 			function shake() {
 				var thing  = $(this);
