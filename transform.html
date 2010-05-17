@@ -123,17 +123,18 @@
 		</section>
 		
 		<!-- JavaScrpt -->
-		<script src="lib/jquery-1.4.2.js"></script>
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.js"></script>
 		<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.js"></script>
 		<script src="lib/sylvester-0.1.3.min.js"></script>
-		<script src="lib/transform.js"></script>
+		<script src="lib/jquery.transform.js"></script>
+		<script src="lib/form.js"></script>
 		<script type="text/javascript">
 			$('#target2').transform({origin: [0, 0]});
 			var thing = $('.transform');
 			var i = 0;
 			thing.click(function() {
 				var $el = $(this);
-				$el.animate({rotate: '+=11.25deg'});
+				$el.animate({rotate: '+=45deg'});
 			});
 			
 			$(document).keydown(function(e) {
