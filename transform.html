@@ -21,20 +21,18 @@
 			</header>
 			<article class="body" role="main">
 				<aside class="right-col">
-					<h3>Standard transform</h3>
+					<h3>Default Origin (Center)</h3>
 					<div class="holder">
-						<div id="target" class="transform">Standard</div>
+						<div id="target" class="transform">I've got an origin in my center.</div>
 					</div>
 					<hr />
-					<h3>Forced top, left origin</h3>
-					<p>(uses absolute positioning)</p>
+					<h3>Top Left Origin</h3>
 					<div class="holder">
-						<div id="target2" class="transform transform-ie">Forced</div>
+						<div id="target2" class="transform">I transform around my top left corner.</div>
 					</div>
 				</aside>
 				<section class="main">
 					<div class="line">
-						<ul id="ie-barf"></ul>
 						<div class="unit size1of2">
 							<form id="transform" name="transform" action="">
 								<div class="line">
@@ -107,14 +105,15 @@
 										<input id="origin-y" name="origin-y" type="text" class="text size1of4" />y%
 									</div>
 								</div>
+								<div class="line">
+									<div class="unit size1of4">&nbsp;</div>
+									<div class="unit size3of4 lastUnit">
+										<label for="animate"><input id="animate" name="animate" type="checkbox" class="checkbox" value="1" /> Animate?</label>
+									</div>
+								</div>
 								<button id="go">Go!</button>
 							</form>
 						</div>
-						<div class="unit size1of2 lastUnit">
-							
-						</div>
-						<pre id="result"></pre>
-						<textarea cols="" rows=""></textarea>
 					</div>
 				</section>
 			</article>
@@ -133,34 +132,8 @@
 			var thing = $('.transform');
 			var i = 0;
 			thing.click(function() {
-				var $el = $(this);
-				$el.animate({rotate: '+=45deg'});
-			});
-			
-			$(document).keydown(function(e) {
-				var prop = {};
-				var pos = thing.position();
-				switch (e.which) {
-					case 40: prop.top = (pos.top + 1) + 'px';break;
-					case 38: prop.top = (pos.top - 1) + 'px';break;
-					case 39: prop.left = (pos.left + 1) + 'px';break;
-					case 37: prop.left = (pos.left - 1) + 'px';break;
-				}
-				if (!$.isEmptyObject(prop)) {
-					e.preventDefault();
-					thing.css(prop);
-				}
-			});
-			
-			function shake() {
-				var thing  = $(this);
-				thing.animate({rotate: '+=2.5', skew: '-=2.5'}, 100, 'easeOutBack', function() {
-					thing.animate({rotate: '-=5', skew: '+=5'}, 200, 'easeOutBack', function() {
-						thing.animate({rotate: '+=2.5', skew: '-=2.5'}, 200, 'easeOutElastic');
-					});
-				});
-			}
-			
+				$(this).animate({rotate: '+=45deg'});
+			});			
 		</script>
 	</body>
 </html>
