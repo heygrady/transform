@@ -10,6 +10,17 @@
 		<script src="lib/modernizr-1.1.min.js"></script>
 		<link rel="stylesheet" href="css/global.css" />
 		<link rel="stylesheet" href="css/transform.css" />
+		<style type="text/css">
+			.transform {
+				/*-moz-transform: rotate(110deg);
+				-webkit-transform: rotate(110deg);
+				-o-transform: rotate(110deg);
+				
+				-moz-transform-origin: 10%;
+				-webkit-transform-origin: 10%;
+				-o-transform-origin: 10%;*/
+			}
+		</style>
 	</head>
 	<body>
 		<section class="page">
@@ -111,6 +122,18 @@
 										<label for="animate"><input id="animate" name="animate" type="checkbox" class="checkbox" value="1" /> Animate?</label>
 									</div>
 								</div>
+								<div class="line">
+									<div class="unit size1of4">&nbsp;</div>
+									<div class="unit size3of4 lastUnit">
+										<ul>
+											<li><label for="reflect"><input id="reflect" name="reflect" type="radio" class="radio" value="reflect" /> Reflect</label></li>
+											<li><label for="reflectX"><input id="reflectX" name="reflect" type="radio" class="radio" value="reflectX" /> Reflect X</label></li>
+											<li><label for="reflectY"><input id="reflectY" name="reflect" type="radio" class="radio" value="reflectY" /> Reflect Y</label></li>
+											<li><label for="reflectXY"><input id="reflectXY" name="reflect" type="radio" class="radio" value="reflectXY" /> Reflect XY</label></li>
+											<li><label for="no-reflect"><input id="no-reflect" name="reflect" type="radio" class="radio" value="no-reflect" checked="checked" /> No Reflection</label></li>
+										</ul>
+									</div>
+								</div>
 								<button id="go">Go!</button>
 							</form>
 						</div>
@@ -128,7 +151,7 @@
 		<script src="lib/jquery.transform.js"></script>
 		<script src="lib/form.js"></script>
 		<script type="text/javascript">
-			$('#target2').transform({rotate: 45, origin: [0, 0]}, {forceMatrix: true});
+			$('#target').animate({origin: '-50px -50px', rotate: 180});
 			
 			var thing = $('.transform');
 			var i = 0;
