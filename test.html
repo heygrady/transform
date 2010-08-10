@@ -1,0 +1,339 @@
+<!doctype html>
+<html lang="en" class="no-js">
+<head>
+	<meta charset="utf-8">
+
+	<!-- http://www.phpied.com/conditional-comments-block-downloads/ -->
+	<!--[if IE]><![endif]-->
+
+	<!-- Always force latest IE rendering engine (even in intranet) & Chrome Frame -->
+	<!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge;chrome=1"><![endif]-->
+
+	<title></title>
+	<meta name="description" content="">
+	<meta name="author" content="">
+
+	<!-- Mobile Viewport Fix
+		@link http://j.mp/mobileviewport & http://davidbcalhoun.com/2010/viewport-metatag 
+	device-width : Occupy full width of the screen in its current orientation
+	initial-scale = 1.0 retains dimensions instead of zooming out if page height > device height
+	maximum-scale = 1.0 retains dimensions instead of zooming in if page width < device width
+	-->
+	<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0;">
+
+	<!-- Place favicon.ico and apple-touch-icon.png in the root of your domain and delete these references -->
+	<link rel="shortcut icon" href="/favicon.ico">
+	<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+
+	<!-- CSS : implied media="all"-->
+	<link rel="stylesheet" href="http://yui.yahooapis.com/3.1.1/build/cssreset/reset-min.css" />
+	<link rel="stylesheet" href="css/style.css?v=0.1">
+ 
+	<!-- All JavaScript at the bottom, except for Modernizr. -->
+	<script src="js/modernizr-1.5.min.js"></script>
+</head>
+
+<!-- http://paulirish.com/2008/conditional-stylesheets-vs-css-hacks-answer-neither/ -->
+
+<!--[if lt IE 7 ]> <body class="ie ie6 lt-ie7 lt-ie8 lt-ie9"> <![endif]-->
+<!--[if IE 7 ]>    <body class="ie ie7 lt-ie8 lt-ie9">        <![endif]-->
+<!--[if IE 8 ]>    <body class="ie ie8 lt-ie9">               <![endif]-->
+<!--[if IE 9 ]>    <body class="ie ie9">                      <![endif]-->
+<!--[if gt IE 9]>  <body>                                     <![endif]-->
+<!--[if !IE]><!--> <body>                                 <!--<![endif]-->
+	<div id="container">
+		<div id="header">
+			<button id="go">Click It!</button>
+			<h2>Test</h2>
+		</div>
+		<div id="body">
+			
+			<div class="clearfix">
+				<div class="box">
+					<div class="outer">
+						<div class="transform">
+							<img src="i/elephant.png" height="150" width="150" />
+						</div>
+					</div>
+				</div>
+				<div class="box">
+					<div class="outer">
+						<div class="transform">
+							<img src="i/arrow-up.png" height="150" width="150" />
+						</div>
+					</div>
+				</div>
+				<div class="box plain">
+					<div class="outer">
+						<div class="transform">
+							<p>Some Text</p>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="clearfix">
+				<div class="box">
+					<div class="outer">
+						<div class="animate">
+							<img src="i/elephant.png" height="150" width="150" />
+						</div>
+					</div>
+				</div>
+				<div class="box">
+					<div class="outer">
+						<div class="animate">
+							<img src="i/arrow-up.png" height="150" width="150" />
+						</div>
+					</div>
+				</div>
+				<div class="box plain">
+					<div class="outer">
+						<div class="animate">
+							<p>Some Text</p>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="clearfix">
+				<div class="box">
+					<div class="outer">
+						<div class="transition">
+							<img src="i/elephant.png" height="150" width="150" />
+						</div>
+					</div>
+				</div>
+				<div class="box">
+					<div class="outer">
+						<div class="transition">
+							<img src="i/arrow-up.png" height="150" width="150" />
+						</div>
+					</div>
+				</div>
+				<div class="box plain">
+					<div class="outer">
+						<div class="transition">
+							<p>Some Text</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div id="footer">
+		
+		</div>
+	</div>
+
+	<!-- JavaScrpt -->
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.js"></script>
+	<script src="lib/jquery.transform.js"></script>
+	<script type="text/javascript">
+		$('#go').click(go);
+		var $elem = $('.transform, .transition');
+		var $anim = $('.animate');
+		var $text = $('h2');
+		var step = 9;
+		function go() {
+			console.log($elem[0].filter);
+			switch (step) {
+				case 0:
+					$elem.transform({"reflect": true});
+					$anim.animate({"reflect": true});
+					$text.text('reflect');
+					break;
+				case 1:
+					$elem.transform({"reflectX": true});
+					$anim.animate({"reflectX": true});
+					$text.text('reflectX');
+					break;
+				case 2:
+					$elem.transform({"reflectXY": true});
+					$anim.animate({"reflectXY": true});
+					$text.text('reflectXY');
+					break;
+				case 3:
+					$elem.transform({"reflectY": true});
+					$anim.animate({"reflectY": true});
+					$text.text('reflectY');
+					break;
+				case 4:
+					$elem.transform({"reflectXY": true});
+					$anim.animate({"reflectXY": true});
+					$text.text('reflectXY');
+					break;
+				case 5:
+					$elem.transform({"rotate": '13deg'});
+					$anim.animate({"rotate": 13}, {
+						'complete': function(){
+							$anim.transform({"rotate": 13});
+						}
+					});
+					$text.text('rotate: 13');
+					break;
+				case 6:
+					$elem.transform({"rotate": '-13deg'});
+					$anim.animate({"rotate": -13}, {
+						'complete': function(){
+							$anim.transform({"rotate": -13});
+						}
+					});
+					$text.text('rotate: -13');
+					break;
+				case 7:
+					$elem.transform({"rotate": 195});
+					$anim.animate({"rotate": 195}, {
+						'complete': function(){
+							$anim.transform({"rotate": 195});
+						}
+					});
+					$text.text('rotate: 195');
+					break;
+				case 8:
+					$elem.transform({"rotate": -195});
+					$anim.animate({"rotate": -195}, {
+						'complete': function(){
+							$anim.transform({"rotate": -195});
+						}
+					});
+					$text.text('rotate : -195');
+					break;
+				case 9:
+					$elem.transform({"scale": .75});
+					$anim.animate({"scale": .75, "rotate": 0}, {
+						'complete': function(){
+							$anim.transform({"scale": .75});
+						}
+					});
+					$text.text('scale : .75');
+					break;
+				case 10:
+					$elem.transform({"scale": [.75, .75]});
+					$anim.animate({"scale": [.75, .75]}, {
+						'complete': function(){
+							$anim.transform({"scale": [.75, .75]});
+						}
+					});
+					$text.text('scale : [.75, .75]');
+					break;
+				case 11:
+					$elem.transform({"scaleX": .75});
+					$anim.animate({"scaleX": .75, "scale": [1, 1]}, {
+						'complete': function(){
+							$anim.transform({"scaleX": .75});
+						}
+					});
+					$text.text('scaleX : .75');
+					break;
+				case 12:
+					$elem.transform({"scaleY": .75});
+					$anim.animate({"scaleY": .75, "scaleX": 1}, {
+						'complete': function(){
+							$anim.transform({"scaleY": .75});
+						}
+					});
+					$text.text('scaleY : .75');
+					break;
+				case 13:
+					$elem.transform({"skew": 13});
+					$anim.animate({"skew": 13, "scaleY": 1}, {
+						'complete': function(){
+							$anim.transform({"skew": 13});
+						}
+					});
+					$text.text('skew : 13');
+					break;
+				case 14:
+					$elem.transform({"skew": ['13', 13]});
+					$anim.animate({"skew": ['13', 13]}, {
+						'complete': function(){
+							$anim.transform({"skew": [13, 13]});
+						}
+					});
+					$text.text('skew : [13, 13]');
+					break;
+				case 15:
+					$elem.transform({"skewX": '13'});
+					$anim.animate({"skewX": '13', "skew": 0}, {
+						'complete': function(){
+							//$anim.transform({"skewX": 13});
+						}
+					});
+					$text.text('skewX : 13');
+					break;
+				case 16:
+					$elem.transform({"skewY": 13});
+					$anim.animate({"skewY": 13, "skewX": 0}, {
+						'complete': function(){
+							$anim.transform({"skewY": 13});
+						}
+					});
+					$text.text('skewY : 13');
+					break;
+				case 17:
+					$elem.transform({"translate": 13});
+					$anim.animate({"translate": 13, "skewY": 0}, {
+						'complete': function(){
+							$anim.transform({"translate": 13});
+						}
+					});
+					$text.text('translate : 13');
+					break;
+				case 18:
+					$elem.transform({"translate": [13, 13]});
+					$anim.animate({"translate": [13, 13]}, {
+						'complete': function(){
+							$anim.transform({"translate": [13, 13]});
+						}
+					});
+					$text.text('translate : [13, 13]');
+					break;
+				case 19:
+					$elem.transform({"translateX": 13});
+					$anim.animate({"translateX": 13, "translate": [0, 0]}, {
+						'complete': function(){
+							$anim.transform({"translateX": 13});
+						}
+					});
+					$text.text('translateX : 13');
+					break;
+				case 20:
+					$elem.transform({"translateY": 13});
+					$anim.animate({"translateY": 13, "translateX": 0}, {
+						'complete': function(){
+							$anim.transform({"translateY": 13});
+						}
+					});
+					$text.text('translateY : 13');
+					break;
+				default:
+					step = -1;
+					$elem.transform({});
+					$anim.animate({"translateY": 0}, {
+						'complete': function(){
+							$anim.transform({});
+						}
+					});
+					$text.text('Test');
+			}
+			step++;
+		}
+	</script>
+	
+ <!-- SECUREDVISIT START --> 
+ 
+	<!-- Tracking - Do Not Change --> 
+	<script type="text/javascript" charset="utf-8"> 
+		document.write(unescape("%3Cscript src='http://track.securedvisit.com/js/sv.js' type='text/javascript' %3E%3C/script%3E")); 
+	</script> 
+	<script type="text/javascript" charset="utf-8"> 
+		try { 
+			// Need to Insert your CiteID 
+			var _svtracker = _svt._getTracker("ABC"); 
+			_svtracker._trackPageView(); 
+		catch(err) {} 
+	</script> 
+	
+	<!-- Need to Insert your CiteID --> 
+	<noscript><img src="//track.securedvisit.com/?sv_cid=ABC" height="1" width="1" /></noscript> 
+	<!-- SECUREDVISIT END -->
+</body>
+</html>

@@ -1,0 +1,87 @@
+html, body {
+	margin: 0;
+	padding: 0;
+	height: 100%;
+}
+
+h2 {
+	font-size: 28px;
+	margin-bottom: 20px;
+}
+
+#container {
+	width: 960px;
+	margin: 10px auto;
+}
+
+#body {
+	padding: 10px;
+	background-image: url(../i/background.jpg);
+	border: 4px solid #000000;
+}
+
+.box {
+	float: left;
+	display: inline;
+	margin-bottom: 10px;
+	margin-right: 10px;
+}
+.outer {
+	height: 150px;
+	width: 150px;
+
+	background-color: #000000;
+	background-color: rgba(0, 0, 0, 0.5);  /* FF3+, Saf3+, Opera 10.10+, Chrome */
+}
+.lt-ie8 .outer {
+	background-color: transparent;
+	filter:  progid:DXImageTransform.Microsoft.gradient(startColorStr='#7F000000',EndColorStr='#7F000000'); /* IE6,IE7 */
+}
+.ie8 .outer {
+	background-color: transparent;
+	-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr='#7F000000',EndColorStr='#7F000000')"; /* IE8 */
+}
+
+.plain .animate,
+.plain .transition,
+.plain .transform {
+	border: 5px solid #000000;
+	background-color: deeppink;
+	padding: 5px;
+	
+	height: 150px;
+	width: 150px;
+	
+	box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	
+	-moz-transform: translate(13px, 13px) translateX(13px);
+}
+
+.transition {
+	-moz-transition-property: -moz-transform;
+	-moz-transition-duration: .4s;
+	-moz-transition-timing-function: ease-in-out;
+	
+	-webkit-transition-property: -moz-transform;
+	-webkit-transition-duration: .4s;
+	-webkit-transition-timing-function: ease-in-out;
+	
+	-o-transition-property: -moz-transform;
+	-o-transition-duration: .4s;
+	-o-transition-timing-function: ease-in-out;
+}
+#body:after,
+.clearfix:after {
+	content: ".";
+	display: block;
+	height: 0;
+	clear: both;
+	visibility: hidden;
+}
+.ie #body,
+.ie .clearfix {
+	zoom: 1;     /* triggers hasLayout */
+	display: block;     /* resets display for IE/Win */
+}
