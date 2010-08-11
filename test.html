@@ -131,7 +131,7 @@
 		var $elem = $('.transform, .transition');
 		var $anim = $('.animate');
 		var $text = $('h2');
-		var step = 9;
+		var step = 17;
 		function go() {
 			console.log($elem[0].filter);
 			switch (step) {
@@ -254,7 +254,7 @@
 					$elem.transform({"skewX": '13'});
 					$anim.animate({"skewX": '13', "skew": 0}, {
 						'complete': function(){
-							//$anim.transform({"skewX": 13});
+							$anim.transform({"skewX": 13});
 						}
 					});
 					$text.text('skewX : 13');
@@ -317,23 +317,5 @@
 			step++;
 		}
 	</script>
-	
- <!-- SECUREDVISIT START --> 
- 
-	<!-- Tracking - Do Not Change --> 
-	<script type="text/javascript" charset="utf-8"> 
-		document.write(unescape("%3Cscript src='http://track.securedvisit.com/js/sv.js' type='text/javascript' %3E%3C/script%3E")); 
-	</script> 
-	<script type="text/javascript" charset="utf-8"> 
-		try { 
-			// Need to Insert your CiteID 
-			var _svtracker = _svt._getTracker("ABC"); 
-			_svtracker._trackPageView(); 
-		catch(err) {} 
-	</script> 
-	
-	<!-- Need to Insert your CiteID --> 
-	<noscript><img src="//track.securedvisit.com/?sv_cid=ABC" height="1" width="1" /></noscript> 
-	<!-- SECUREDVISIT END -->
 </body>
 </html>
