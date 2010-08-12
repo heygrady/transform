@@ -27,7 +27,7 @@ h2 {
 	margin-right: 10px;
 }
 .outer {
-	height: 150px;
+	/*height: 150px;*/
 	width: 150px;
 
 	background-color: #000000;
@@ -40,6 +40,13 @@ h2 {
 .ie8 .outer {
 	background-color: transparent;
 	-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr='#7F000000',EndColorStr='#7F000000')"; /* IE8 */
+}
+
+.animate,
+.transition,
+.transform {
+	height: 150px;
+	width: 150px;
 }
 
 .plain .animate,

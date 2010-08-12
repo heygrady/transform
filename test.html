@@ -128,12 +128,12 @@
 	<script src="lib/jquery.transform.js"></script>
 	<script type="text/javascript">
 		$('#go').click(go);
+		
 		var $elem = $('.transform, .transition');
 		var $anim = $('.animate');
 		var $text = $('h2');
-		var step = 17;
+		var step = 0;
 		function go() {
-			console.log($elem[0].filter);
 			switch (step) {
 				case 0:
 					$elem.transform({"reflect": true});
