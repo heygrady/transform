@@ -44,6 +44,7 @@
 	<div id="container">
 		<div id="header">
 			<button id="go">Click It!</button>
+			<button id="test">Test!</button>
 			<h2>Test</h2>
 		</div>
 		<div id="body">
@@ -119,7 +120,14 @@
 			</div>
 		</div>
 		<div id="footer">
-		
+				<div class="box plain">
+					<div class="outer">
+						<div class="transform">
+							<p>Some Text</p>
+						</div>
+					</div>
+				</div>
+			
 		</div>
 	</div>
 
@@ -127,6 +135,15 @@
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.js"></script>
 	<script src="lib/jquery.transform.js"></script>
 	<script type="text/javascript">
+		$('#test').click(test);
+		
+		function test() {
+			var $elem = $elem = $('.transform:last');
+			
+			$elem.transform({matrix: [.75, 0, 0, .75], reflect: false});
+		}
+		
+		
 		$('#go').click(go);
 		
 		var $elem = $('.transform, .transition');
@@ -137,32 +154,54 @@
 			switch (step) {
 				case 0:
 					$elem.transform({"reflect": true});
-					$anim.animate({"reflect": true});
+					$anim.animate({"reflect": true}, {
+						'duration': 1000,
+						'complete': function(){
+							//$anim.transform({"reflect": true});
+						}
+					});
 					$text.text('reflect');
+					
 					break;
 				case 1:
 					$elem.transform({"reflectX": true});
-					$anim.animate({"reflectX": true});
+					$anim.animate({"reflectX": true}, {
+						'complete': function(){
+							//$anim.transform({"reflectX": true});
+						}
+					});
 					$text.text('reflectX');
 					break;
 				case 2:
 					$elem.transform({"reflectXY": true});
-					$anim.animate({"reflectXY": true});
+					$anim.animate({"reflectXY": true}, {
+						'complete': function(){
+							//$anim.transform({"reflectXY": true});
+						}
+					});
 					$text.text('reflectXY');
 					break;
 				case 3:
 					$elem.transform({"reflectY": true});
-					$anim.animate({"reflectY": true});
+					$anim.animate({"reflectY": true}, {
+						'complete': function(){
+							//$anim.transform({"reflectY": true});
+						}
+					});
 					$text.text('reflectY');
 					break;
 				case 4:
 					$elem.transform({"reflectXY": true});
-					$anim.animate({"reflectXY": true});
+					$anim.animate({"reflectXY": true}, {
+						'complete': function(){
+							//$anim.transform({"reflectXY": true});
+						}
+					});
 					$text.text('reflectXY');
 					break;
 				case 5:
 					$elem.transform({"rotate": '13deg'});
-					$anim.animate({"rotate": 13}, {
+					$anim.animate({"rotate": 13, "reflectXY": false}, {
 						'complete': function(){
 							$anim.transform({"rotate": 13});
 						}

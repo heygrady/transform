@@ -27,7 +27,7 @@ h2 {
 	margin-right: 10px;
 }
 .outer {
-	/*height: 150px;*/
+	position: relative;
 	width: 150px;
 
 	background-color: #000000;
@@ -41,7 +41,9 @@ h2 {
 	background-color: transparent;
 	-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr='#7F000000',EndColorStr='#7F000000')"; /* IE8 */
 }
-
+#footer {
+	padding-top: 25px;
+}
 .animate,
 .transition,
 .transform {
@@ -51,7 +53,8 @@ h2 {
 
 .plain .animate,
 .plain .transition,
-.plain .transform {
+.plain .transform,
+.plain .transform2 {
 	border: 5px solid #000000;
 	background-color: deeppink;
 	padding: 5px;
@@ -65,7 +68,13 @@ h2 {
 	
 	-moz-transform: translate(13px, 13px) translateX(13px);
 }
-
+.plain .transform2 {
+	position: absolute;
+	height: 180px;
+	width: 180px;
+	top: -15px;
+	left: -15px;
+}
 .transition {
 	-moz-transition-property: -moz-transform;
 	-moz-transition-duration: .4s;
