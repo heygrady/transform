@@ -1,0 +1,51 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Untitled Document</title>
+<style type="text/css">
+.wrap {
+	width: 150px;
+	height: 150px;
+	background-color: #eeeeee;
+	margin: 25px;	
+}
+.transform {
+	width: 130px;
+	height: 130px;
+	padding: 10px;
+	background-color: deeppink;	
+}
+.ie {
+	
+}
+</style>
+</head>
+
+<body>
+
+<div class="wrap">
+	<div class="transform">Transform This</div>
+</div>
+<div class="wrap">
+	<div class="transform ie">Transform This</div>
+</div>
+<div class="wrap">
+	<div class="transform ie">Transform This</div>
+</div>
+
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.js"></script>
+<script type="text/javascript" src="lib/jquery.transform.js"></script>
+<script type="text/javascript">
+	$('.transform').click(function() {
+		$(this).transform({scale: '1.25', skew: '25', rotate: 180, reflectY: true, translate: 25}, {forceMatrix: true});
+	});
+	
+	var i = 0;
+	$('.ie').unbind().click(function() {
+		$(this).transform({scale: '1.25', skew: '25', rotate: 180, reflectY: true, translate: 25});
+	});
+	
+</script>
+</body>
+</html>
