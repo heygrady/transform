@@ -1,10 +1,12 @@
 /*!
- * jQuery 2d Transform
+ * jQuery 2d Transform v@VERSION
  * http://wiki.github.com/heygrady/transform/
  *
  * Copyright 2010, Grady Kuhnline
  * Dual licensed under the MIT or GPL Version 2 licenses.
  * http://jquery.org/license
+ * 
+ * Date: 
  */
 ///////////////////////////////////////////////////////
 // Transform
@@ -17,8 +19,43 @@
 	
 	// Steal some code from Modernizr
 	var m = document.createElement( 'modernizr' ),
-		m_style = m.style,
-		docElement = document.documentElement;
+		m_style = m.style;
+		
+	function stripUnits(arg) {
+		return parseFloat(arg);
+	}
+	
+	/**
+	 * Find the prefix that this browser uses
+	 */	
+	function getVendorPrefix() {
+		var property = {
+			transformProperty : '',
+			MozTransform : '-moz-',
+			WebkitTransform : '-webkit-',
+			OTransform : '-o-',
+			msTransform : '-ms-'
+		};
+		for (var p in property) {
+			if (typeof m_style[p] != 'undefined') {
+				return property[p];
+			}
+		}
+		return null;
+	}
+	
+	function supportCssTransforms() {
+		if (typeof(window.Modernizr) !== 'undefined') {
+			return Modernizr.csstransforms;
+		}
+		
+		var props = [ 'transformProperty', 'WebkitTransform', 'MozTransform', 'OTransform', 'msTransform' ];
+		for ( var i in props ) {
+			if ( m_style[ props[i] ] !== undefined  ) {
+				return true;
+			}
+		}
+	}
 		
 	// Capture some basic properties
 	var vendorPrefix			= getVendorPrefix(),
@@ -345,8 +382,7 @@
 			
 			// IE glues the top-most and left-most pixels of the transformed object to top/left of the original object
 			//TODO: This seems wrong in the calculations
-			var sides = calc.sides(),
-				size = calc.offset();
+			var sides = calc.sides();
 
 			// Protect against an item that is already positioned
 			var cssPosition = this.$elem.css('position');
@@ -369,42 +405,6 @@
 			this.$elem.css(css);
 		}
 	};
-	
-	function stripUnits(arg) {
-		return parseFloat(arg);
-	}
-	
-	/**
-	 * Find the prefix that this browser uses
-	 */	
-	function getVendorPrefix() {
-		var property = {
-			transformProperty : '',
-			MozTransform : '-moz-',
-			WebkitTransform : '-webkit-',
-			OTransform : '-o-',
-			msTransform : '-ms-'
-		};
-		for (var p in property) {
-			if (typeof m_style[p] != 'undefined') {
-				return property[p];
-			}
-		}
-		return null;
-	}
-	
-	function supportCssTransforms() {
-		if (typeof(window.Modernizr) !== 'undefined') {
-			return Modernizr.csstransforms;
-		}
-		
-		var props = [ 'transformProperty', 'WebkitTransform', 'MozTransform', 'OTransform', 'msTransform' ];
-		for ( var i in props ) {
-			if ( m_style[ props[i] ] !== undefined  ) {
-				return true;
-			}
-		}
-	}
 	
 	/**
 	 * Ensure that values have the appropriate units on them

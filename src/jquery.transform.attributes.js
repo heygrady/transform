@@ -1,8 +1,9 @@
+
 ///////////////////////////////////////////////////////
 // Attr
 ///////////////////////////////////////////////////////
 (function($, window, document, undefined) {
-	var rfuncvalue = /([\w-]*?)\((.*?)\)/g, // with values
+	var rfuncvalue = /([\w\-]*?)\((.*?)\)/g, // with values
 		attr = 'data-transform',
 		rspace = /\s/,
 		rcspace = /,\s/;
@@ -77,8 +78,7 @@
 			}
 			
 			// replace the existing value
-			var attrs = {},
-				result, parts, value;
+			var attrs = {}, parts, value;
 			
 			rfuncvalue.lastIndex = 0; // reset the regex pointer
 			while ((parts = rfuncvalue.exec(transform)) !== null) {
@@ -103,10 +103,10 @@
 			
 			// animate needs sensible defaults for some props
 			switch (func) {
-				case 'scale': return [1, 1]; break;
+				case 'scale': return [1, 1];
 				case 'scaleX': // no break;
-				case 'scaleY': return 1; break;
-				case 'matrix': return [1, 0, 0, 1, 0, 0]; break;
+				case 'scaleY': return 1;
+				case 'matrix': return [1, 0, 0, 1, 0, 0];
 				case 'origin':
 					if ($.support.csstransforms) {
 						// supported browsers return percentages always
