@@ -18,6 +18,7 @@ version    = File.read( File.join( prefix, 'version.txt' ) ).strip
 # jQuery files/dirs
 jq         = File.join( dist_dir, "jquery.transform-#{version}.js" )
 jq_min     = File.join( dist_dir, "jquery.transform-#{version}.min.js" )
+jq_test    = File.join( dist_dir, "jquery.transform.js" )
 
 
 # Build tools
@@ -31,12 +32,12 @@ verbose(false)
 task :default => "all"
 
 desc "Builds jQuery; Tests with JSLint; Minifies jQuery"
-task :all => [:jquery, :lint, :min] do
+task :all => [:dist, :jquery, :lint, :min] do
   puts "jQuery build complete."
 end
 
 desc "Builds jQuery Transform: jquery.transform.js (Default task)"
-task :jquery => [jq]
+task :jquery => [jq, jq_test]
 
 desc "Builds a minified version of jQuery Transform: jquery.transform.min.js"
 task :min => jq_min
@@ -46,7 +47,7 @@ task :init => [] do
 end
 
 desc "Removes dist folder"
-task :clean do
+task :dist do
   puts "Removing Distribution directory: #{dist_dir}..." 
   rm_rf dist_dir
 end
@@ -72,6 +73,11 @@ end
 file jq_min => jq do
   puts "Building jquery.transform.min.js..."
   sh "#{minfier} -o \"#{jq_min}\" \"#{jq}\""
+end
+
+file jq_test => jq do
+  puts "Building a test version of Transform 3d..."
+  cp jq, jq_test
 end
 
 def cat( files )
