@@ -116,7 +116,7 @@
 			});
 		}
 		return _custom.apply(this, arguments);
-	}
+	};
 	
 	/**
 	 * Animates a multi value attribute
@@ -179,15 +179,11 @@
 				});
 			}
 			
-			if ($.cssMultipleValues[func]) {
-				($.fx.multipleValueStep[fx.prop] || $.fx.multipleValueStep._default)(fx);
-				funcs['matrix'] = [];
-				$.each(fx.values, function(i, val) {
-					funcs['matrix'].push(val.now);
-				});
-			} else {
-				funcs['matrix'] = fx.now;
-			}
+			($.fx.multipleValueStep[fx.prop] || $.fx.multipleValueStep._default)(fx);
+			funcs.matrix = [];
+			$.each(fx.values, function(i, val) {
+				funcs.matrix.push(val.now);
+			});
 			
 			transform.exec(funcs, {preserve: true});
 		};

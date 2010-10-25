@@ -46,9 +46,8 @@
 <script type="text/javascript">
 
 	var $elem = $('.transform');
-	$elem.eq(0).animate({reflectXY: 1});
-	$elem.eq(1).transform({reflectXY: 1});
-	$elem.eq(2).css({reflectXY: 1});
+	$elem.animate({scale : 1.5}, "slow").animate({scale : 1}, "slow");
+
 	
 	$('.transform').click(function() {
 		var $elem = $(this);

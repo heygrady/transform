@@ -6,7 +6,7 @@
  * Dual licensed under the MIT or GPL Version 2 licenses.
  * http://jquery.org/license
  * 
- * Date: Wed Oct 6 23:16:32 2010 -0700
+ * Date: Sun Oct 24 22:50:33 2010 -0700
  */
 ///////////////////////////////////////////////////////
 // Transform
@@ -576,7 +576,7 @@
 	var rfuncvalue = /([\w\-]*?)\((.*?)\)/g, // with values
 		attr = 'data-transform',
 		rspace = /\s/,
-		rcspace = /,\s/;
+		rcspace = /,\s?/;
 	
 	$.extend($.transform.prototype, {		
 		/**
@@ -609,13 +609,12 @@
 			if ($.isArray(value)) {
 				value = value.join(', ');
 			}
-			value = $.trim(value+'');
 			
 			// pull from a local variable to look it up
 			var transform = this.attr || this.$elem.attr(attr);
 			
 			if (!transform || transform.indexOf(func) > -1) {
-				// We don't have any existing values, save it
+				// we don't have any existing values, save it
 				// we don't have this function yet, save it
 				this.attr = $.trim(transform + ' ' + func + '(' + value + ')');
 				this.$elem.attr(attr, this.attr);
@@ -666,44 +665,91 @@
 		 */
 		getAttr: function(func) {
 			var attrs = this.getAttrs();
-			
 			if (typeof attrs[func] !== 'undefined') {
 				return attrs[func];
 			}
 			
-			// animate needs sensible defaults for some props
-			switch (func) {
-				case 'scale': return [1, 1];
-				case 'scaleX': // no break;
-				case 'scaleY': return 1;
-				case 'matrix': return [1, 0, 0, 1, 0, 0];
-				case 'origin':
-					if ($.support.csstransforms) {
-						// supported browsers return percentages always
-						return this.$elem.css(this.transformOriginProperty).split(rspace);
-					} else {
-						// just force IE to also return a percentage
-						return ['50%', '50%'];
-					}
+			//TODO: move the origin to a function
+			if (func === 'origin' && $.support.csstransforms) {
+				// supported browsers return percentages always
+				return this.$elem.css(this.transformOriginProperty).split(rspace);
+			} else if (func === 'origin') {
+				// just force IE to also return a percentage
+				return ['50%', '50%'];
 			}
-			return null;
+			
+			return $.cssDefault[func] || 0;
 		}
+	});
+	
+	// Define default values
+	if (typeof($.cssDefault) == 'undefined') {
+		$.cssDefault = {};
+	}
+	$.cssDefault.scale = [1, 1];
+	$.cssDefault.scaleX = 1;
+	$.cssDefault.scaleY = 1;
+	$.cssDefault.matrix = [1, 0, 0, 1, 0, 0];
+	$.cssDefault.origin = ['50%', '50%']; // TODO: allow this to be a function, like get
+	
+	$.cssDefault.reflect = [1, 0, 0, 1, 0, 0];
+	$.cssDefault.reflectX = [1, 0, 0, 1, 0, 0];
+	$.cssDefault.reflectXY = [1, 0, 0, 1, 0, 0];
+	$.cssDefault.reflectY = [1, 0, 0, 1, 0, 0];
+	
+	// Define functons with multiple values
+	if (typeof($.cssMultipleValues) == 'undefined') {
+		$.cssMultipleValues = {};
+	}
+	$.extend($.cssMultipleValues, {
+		matrix: 6,
+		
+		reflect: 6,
+		reflectX: 6,
+		reflectXY: 6,
+		reflectY: 6,
+		
+		scale: {
+			length: 2,
+			duplicate: true
+		},
+		skew: 2,
+		translate: 2
+	});
+	
+	// override all of the css functions
+	$.each($.transform.funcs, function(i, func) {
+		$.cssNumber[func] = true;
+		$.cssHooks[func] = {
+			set: function(elem, value) {
+				var transform = elem.transform || new $.transform(elem),
+					funcs = {};
+				funcs[func] = value;
+				transform.exec(funcs, {preserve: true});
+			},
+			get: function(elem, computed) {
+				var transform = elem.transform || new $.transform(elem);
+				return transform.getAttr(func);
+			}
+		};
+	});
+	
+	// Support Reflection animation better by returning a matrix
+	$.each(['reflect', 'reflectX', 'reflectXY', 'reflectY'], function(i, func) {
+		$.cssHooks[func].get = function(elem, computed) {
+			var transform = elem.transform || new $.transform(elem);
+			return transform.getAttr('matrix') || $.cssDefault[func];
+		};
 	});
 })(jQuery, this, this.document);
 ///////////////////////////////////////////////////////
 // Animation
 ///////////////////////////////////////////////////////
 (function($, window, document, undefined) {
-	// Extend the jQuery animation to handle transform functions
 	/**
 	 * @var Regex looks for units on a string
 	 */
 	var rfxnum = /^([+\-]=)?([\d+.\-]+)(.*)$/;
-	
-	/**
-	 * @var Regex identify if additional values are hidden in the unit 
-	 */
-	var rfxmultinum = /^(.*?)\s+([+\-]=)?([\d+.\-]+)(.*)$/;
 	
 	/**
 	 * Doctors prop values in the event that they contain spaces
@@ -715,197 +761,112 @@
 	 */
 	var _animate = $.fn.animate;
 	$.fn.animate = function( prop, speed, easing, callback ) {
-		//NOTE: The $.fn.animate() function is a big jerk and requires
-		//		you to attempt to convert the values passed into pixels.
-		//		So we have to doctor the values passed in here to make
-		//		sure $.fn.animate() won't think there's units an ruin
-		//		our fun.
-		if (prop && !jQuery.isEmptyObject(prop)) {
-			var $elem = this;
+		var optall = jQuery.speed(speed, easing, callback);
+		
+		// Capture multiple values
+		if (!jQuery.isEmptyObject(prop)) {
 			jQuery.each( prop, function( name, val ) {
-				// Clean up the numbers for space-sperated prop values
-				if ($.inArray(name, $.transform.funcs) != -1) {
-					// allow for reflection animation
-					if ($.transform.rfunc.reflect.test(name)) {
-						var m = val ? $.matrix[name]() : $.matrix.identity(), 
-							e = m.elements;
-						val = [e[0], e[1], e[2], e[3]]; 
+				if ($.cssMultipleValues[name]) {
+					if (typeof optall.multiple === 'undefined') {
+						optall.multiple = {};
 					}
-				
-					var parts = rfxnum.exec(val);
 					
-					if ((parts && parts[3]) || $.isArray(val)) {
-						// Either a unit was found or an array was passed
-						var end, unit, values = [];
-						
-						if ($.isArray(val)) {
-							// An array was passed
-							$.each(val, function(i) {
-								parts = rfxnum.exec(this);
-								end = parseFloat(parts[2]);
-								unit = parts[3] || "px";
-										
-								// Remember value
-								values.push({
-									end: (parts[1] ? parts[1] : '') + end,
-									unit: unit
-								});
-							});
-						} else {
-							// A unit was found
-							end = parseFloat( parts[2] );
-							unit = parts[3] || "px";
-								
-							// Remember the first value
-							values.push({
-								end: (parts[1] ? parts[1] : '') + end,
-								unit: unit
-							});
-							
-							// Detect additional values hidden in the unit
-							var i = 0;
-							while (parts = rfxmultinum.exec(unit)) {
-								// Fix the previous unit
-								values[i].unit = parts[1];
-								
-								// Remember this value
-								values.push({
-									end: (parts[2] ? parts[2] : '') + parseFloat(parts[3]),
-									unit: parts[4]
-								});
-								unit = parts[4];
-								i++;
-							}
-						}
+					// force the original values onto the optall
+					optall.multiple[name] = val.toString();
 					
-						// Save the values and truncate the value to make it safe to animate
-						$elem.data('data-animate-' + name, values);
-						prop[name] = values[0].end; // NOTE: this propegates into the arguments object
-					}
+					// reduce to a unitless number
+					prop[name] = parseFloat(val);
 				}
-			});
+			} );
 		}
-		//NOTE: we edit prop above
-		return _animate.apply(this, arguments);
+		
+		//NOTE: we edited prop above to trick animate
+		return _animate.apply(this, [arguments[0], optall]);
 	};
 	
-	/**
-	 * Returns appropriate start value for transform props
-	 * @param Boolean force
-	 * @return Number
-	 */
-	var _cur = $.fx.prototype.cur;
-	$.fx.prototype.cur = function(force) {
-		//NOTE: The cur function tries to look things up on the element
-		//		itself as a native property first instead of as a style
-		//		property. However, the animate function is a big jerk
-		//		and it's extremely easy to poison the element.style 
-		//		with a random property and ruin all of the fun. So, it's
-		//		easier to just look it up ourselves.
-		if ($.inArray(this.prop, $.transform.funcs) != -1) {
-			this.transform = this.transform || this.elem.transform || new $.transform(this.elem);
-			var r = $.transform.rfunc;
+	var _custom = $.fx.prototype.custom;
+	$.fx.prototype.custom = function() {
+		var multiple = $.cssMultipleValues[this.prop];
+		if (multiple) {
+			this.values = [];
 			
-			// return a single unitless number and animation will play nice
-			var value = this.transform.getAttr(this.prop),
-				parts = rfxnum.exec($.isArray(value) ? value[0] : value);
-			if (value === null || parts === null) {
-				value = r.scale.test(this.prop) || r.reflect.test(this.prop)  ? 1 : 0;
-				parts = [null, null, value];
+			// Pull out the known values
+			var values = this.options.multiple[this.prop],
+				currentValues = $(this.elem).css(this.prop),
+				defaultValues = $.cssDefault[this.prop] || 0;
+			
+			// make sure the current css value is an array
+			if (!$.isArray(currentValues)) {
+				currentValues = [currentValues];
 			}
-			return parseFloat(parts[2]);
-		}
-		return _cur.apply(this, arguments);
-	};
-	
-	/**
-	 * Detects the existence of a space separated value
-	 * @param Object fx
-	 * @return null
-	 */
-	$.fx.multivalueInit = function(fx) {
-		var $elem = $(fx.elem),
-			values = fx.transform.getAttr(fx.prop), // existing values
-			initValues = $elem.data('data-animate-' + fx.prop); // new values passed into animate
-		
-		if (initValues) {
-			$elem.removeData('data-animate-' + fx.prop); // unremember the saved property
-		}
-		
-		if ($.transform.rfunc.reflect.test(fx.prop)) {
-			values = fx.transform.getAttr('matrix');
-		}
-		
-		fx.values = [];
-		
-		// If we found a previous array but we're only setting one value, we need to set both
-		if ($.isArray(values) && !$.isArray(initValues)) {
-			initValues = [
-				{
-					end: parseFloat(fx.end),
-					unit: fx.unit
-				},
-				{
-					end: $.transform.rfunc.scale.test(fx.prop) ? 1 : 0,
-					unit: fx.unit
-				}
-			];
-		}
-		
-		// If we altered the values before
-		// This happens in the doctored animate function when we pass a unit or multiple values
-		if (initValues) {
-			var start,
-				rscalefunc = $.transform.rfunc.scale,
-				parts;
-			$.each(initValues, function(i, val) {
-				// pull out the start value
-				if ($.isArray(values)) {
-					start = values[i];
-				} else if (i > 0) {
-					// scale duplicates the values for x and y
-					start = rscalefunc.test(fx.prop) ? values : null;
+			
+			// make sure the new values are an array
+			if (!$.isArray(values)) {
+				if ($.type(values) === 'string') {
+					values = values.split(',');
 				} else {
-					start = values;
+					values = [values];
 				}
-				
-				// if we didn't find a start value
-				if (!start && start !== 0) {
-					start = rscalefunc.test(fx.prop) ? 1 : 0;
+			}
+			
+			// make sure we have enough new values
+			var length = multiple.length || multiple, i = 0;
+			while (values.length < length) {
+				values.push(multiple.duplicate ? values[0] : defaultValues[i] || 0);
+				i++;
+			}
+			
+			// calculate a start, end and unit for each new value
+			var start, parts, end, unit, fx = this;
+
+			$.each(values, function(i, val) {
+				// find a sensible start value
+				if (currentValues[i]) {
+					start = currentValues[i];
+				} else if (defaultValues[i] && !multiple.duplicate) {
+					start = defaultValues[i];
+				} else if (multiple.duplicate) {
+					start = currentValues[0];
+				} else {
+					start = 0;
 				}
-				
-				// ensure a number
 				start = parseFloat(start);
 				
-				// handle the existence of += and -= prefixes
-				parts = rfxnum.exec(val.end);
-				if (parts && parts[1]) {
-					val.end = ((parts[1] === "-=" ? -1 : 1) * parseFloat(parts[2])) + start;
+				// parse the value with a regex
+				parts = rfxnum.exec(val);
+				
+				if (parts) {
+					// we found a sensible value and unit
+					end = parseFloat( parts[2] );
+					unit = parts[3] || "px"; //TODO: change to an appropriate default unit
+					
+					// If a +=/-= token was provided, we're doing a relative animation
+					if (parts[1]) {
+						end = ((parts[1] === "-=" ? -1 : 1) * end) + start;
+					}
+				} else {
+					// I don't know when this would happen
+					end = val;
+					unit = ''; 
 				}
 				
 				// Save the values
 				fx.values.push({
-					start: parseFloat(start),
-					end: parseFloat(val.end),
-					unit: val.unit
-				});
-			});
-		} else {
-			// Save the known value
-			fx.values.push({
-				start: parseFloat(fx.start),
-				end: parseFloat(fx.end), // force a Number
-				unit: fx.unit
+					start: start,
+					end: end,
+					unit: unit
+				});				
 			});
 		}
+		return _custom.apply(this, arguments);
 	};
-
+	
 	/**
 	 * Animates a multi value attribute
 	 * @param Object fx
 	 * @return null
 	 */
-	$.fx.multivalueStep = {
+	$.fx.multipleValueStep = {
 		_default: function(fx) {
 			$.each(fx.values, function(i, val) {
 				fx.values[i].now = val.start + ((val.end - val.start) * fx.pos);
@@ -918,72 +879,56 @@
 	 */
 	$.each($.transform.funcs, function(i, func) {
 		$.fx.step[func] = function(fx) {
-			// Initialize the transformation
-			if (!fx.transformInit) {
-				fx.transform = fx.transform || fx.elem.transform || new $.transform(fx.elem);
-								
-				// Handle multiple values
-				$.fx.multivalueInit(fx);
-				if (fx.values.length > 1) {
-					fx.multiple = true;
-				}
-				
-				// Force degrees for angles, Remove units for unitless
-				var r = $.transform.rfunc;
-				if (r.angle.test(fx.prop)) {
-					//TODO: we should convert from other rational units
-					fx.unit = 'deg';
-				} else if (r.scale.test(fx.prop)) {
-					fx.unit = ''; 
-				} else if (r.reflect.test(fx.prop)) {
-					//TODO: for animation purposes, this is a matrix and can be animated (although it looks silly)
-					fx.unit = ''; //this is a boolean func
-				} else if (fx.prop == 'matrix') {
-					fx.unit = '';
-				}
-				//TODO: I guess we already foced length units earlier
-				
-				// Force all units on multiple values to be the same
-				//TODO: we should convert from other rational units
-				$.each(fx.values, function(i) {fx.values[i].unit = fx.unit;});
-				
-				fx.transformInit = true;
-			}
+			var transform = fx.elem.transform || new $.transform(fx.elem),
+				funcs = {};
 			
-			
-			// Increment all of the values
-			if (fx.multiple) {
-				($.fx.multivalueStep[fx.prop] || $.fx.multivalueStep._default)(fx);
+			if ($.cssMultipleValues[func]) {
+				($.fx.multipleValueStep[fx.prop] || $.fx.multipleValueStep._default)(fx);
+				funcs[fx.prop] = [];
+				$.each(fx.values, function(i, val) {
+					funcs[fx.prop].push(val.now);
+				});
 			} else {
-				fx.values[0].now = fx.now;
+				funcs[fx.prop] = fx.now;
 			}
 			
-			var values = [];
-			
-			// Do some value correction and join the values
-			$.each(fx.values, function(i, value) {
-				// Keep angles below 360 in either direction.
-				if (value.unit == 'deg') {
-					while (value.now >= 360 ) {
-						value.now -= 360;
-					}
-					while (value.now <= -360 ) {
-						value.now += 360;
-					}
-				}
-				// TODO: handle reflection matrices here
+			transform.exec(funcs, {preserve: true});
+		};
+	});
+	
+	// Support Reflection animation
+	$.each(['reflect', 'reflectX', 'reflectXY', 'reflectY'], function(i, func) {
+		var _step = $.fx.step[func];
+		$.fx.step[func] = function(fx) {
+			var transform = fx.elem.transform || new $.transform(fx.elem),
+				funcs = {};
 				
-				//Pretty up the final value (use the double parseFloat
-				//	to correct super small decimals)
-				values.push(parseFloat(parseFloat(value.now).toFixed(8)) + value.unit);
+			if (!fx.initialized) {
+				fx.start = 
+				fx.initialized = true;
+				var values = $.matrix[func]().elements;
+				
+				$.each(fx.values, function(i) {
+					var val;
+					switch (i) {
+						case 0: val = values[0]; break;
+						case 1: val = values[2]; break;
+						case 2: val = values[1]; break;
+						case 3: val = values[3]; break;
+						default: val = 0;
+					}
+					fx.values[i].end = val;
+					fx.initialized = true;
+				});
+			}
+			
+			($.fx.multipleValueStep[fx.prop] || $.fx.multipleValueStep._default)(fx);
+			funcs.matrix = [];
+			$.each(fx.values, function(i, val) {
+				funcs.matrix.push(val.now);
 			});
 			
-			// Apply the transformation
-			var funcs = {},
-				prop = $.transform.rfunc.reflect.test(fx.prop) ? 'matrix' : fx.prop;
-						
-			funcs[prop] = fx.multiple ? values : values[0];
-			fx.transform.exec(funcs, {preserve: true});
+			transform.exec(funcs, {preserve: true});
 		};
 	});
 })(jQuery, this, this.document);
@@ -1767,6 +1712,26 @@
 				0, 1, ty,
 				0, 0, 1
 			);
+		},
+		
+		/**
+		 * Translate on the X-axis
+		 * @param Number tx
+		 * @return Matrix
+		 * @link http://www.w3.org/TR/SVG/coords.html#TranslationDefined
+		 */
+		translateX: function (tx) {
+			return $.matrix.translate(tx);
+		},
+		
+		/**
+		 * Translate on the Y-axis
+		 * @param Number ty
+		 * @return Matrix
+		 * @link http://www.w3.org/TR/SVG/coords.html#TranslationDefined
+		 */
+		translateY: function (ty) {
+			return $.matrix.translate(0, ty);
 		}
 	});
 })(jQuery, this, this.document);
