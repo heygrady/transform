@@ -6,7 +6,7 @@
 	var rfuncvalue = /([\w\-]*?)\((.*?)\)/g, // with values
 		attr = 'data-transform',
 		rspace = /\s/,
-		rcspace = /,\s/;
+		rcspace = /,\s?/;
 	
 	$.extend($.transform.prototype, {		
 		/**
@@ -39,13 +39,12 @@
 			if ($.isArray(value)) {
 				value = value.join(', ');
 			}
-			value = $.trim(value+'');
 			
 			// pull from a local variable to look it up
 			var transform = this.attr || this.$elem.attr(attr);
 			
 			if (!transform || transform.indexOf(func) > -1) {
-				// We don't have any existing values, save it
+				// we don't have any existing values, save it
 				// we don't have this function yet, save it
 				this.attr = $.trim(transform + ' ' + func + '(' + value + ')');
 				this.$elem.attr(attr, this.attr);
@@ -96,27 +95,80 @@
 		 */
 		getAttr: function(func) {
 			var attrs = this.getAttrs();
-			
 			if (typeof attrs[func] !== 'undefined') {
 				return attrs[func];
 			}
 			
-			// animate needs sensible defaults for some props
-			switch (func) {
-				case 'scale': return [1, 1];
-				case 'scaleX': // no break;
-				case 'scaleY': return 1;
-				case 'matrix': return [1, 0, 0, 1, 0, 0];
-				case 'origin':
-					if ($.support.csstransforms) {
-						// supported browsers return percentages always
-						return this.$elem.css(this.transformOriginProperty).split(rspace);
-					} else {
-						// just force IE to also return a percentage
-						return ['50%', '50%'];
-					}
+			//TODO: move the origin to a function
+			if (func === 'origin' && $.support.csstransforms) {
+				// supported browsers return percentages always
+				return this.$elem.css(this.transformOriginProperty).split(rspace);
+			} else if (func === 'origin') {
+				// just force IE to also return a percentage
+				return ['50%', '50%'];
 			}
-			return null;
+			
+			return $.cssDefault[func] || 0;
 		}
+	});
+	
+	// Define default values
+	if (typeof($.cssDefault) == 'undefined') {
+		$.cssDefault = {};
+	}
+	$.cssDefault.scale = [1, 1];
+	$.cssDefault.scaleX = 1;
+	$.cssDefault.scaleY = 1;
+	$.cssDefault.matrix = [1, 0, 0, 1, 0, 0];
+	$.cssDefault.origin = ['50%', '50%']; // TODO: allow this to be a function, like get
+	
+	$.cssDefault.reflect = [1, 0, 0, 1, 0, 0];
+	$.cssDefault.reflectX = [1, 0, 0, 1, 0, 0];
+	$.cssDefault.reflectXY = [1, 0, 0, 1, 0, 0];
+	$.cssDefault.reflectY = [1, 0, 0, 1, 0, 0];
+	
+	// Define functons with multiple values
+	if (typeof($.cssMultipleValues) == 'undefined') {
+		$.cssMultipleValues = {};
+	}
+	$.extend($.cssMultipleValues, {
+		matrix: 6,
+		
+		reflect: 6,
+		reflectX: 6,
+		reflectXY: 6,
+		reflectY: 6,
+		
+		scale: {
+			length: 2,
+			duplicate: true
+		},
+		skew: 2,
+		translate: 2
+	});
+	
+	// override all of the css functions
+	$.each($.transform.funcs, function(i, func) {
+		$.cssNumber[func] = true;
+		$.cssHooks[func] = {
+			set: function(elem, value) {
+				var transform = elem.transform || new $.transform(elem),
+					funcs = {};
+				funcs[func] = value;
+				transform.exec(funcs, {preserve: true});
+			},
+			get: function(elem, computed) {
+				var transform = elem.transform || new $.transform(elem);
+				return transform.getAttr(func);
+			}
+		};
+	});
+	
+	// Support Reflection animation better by returning a matrix
+	$.each(['reflect', 'reflectX', 'reflectXY', 'reflectY'], function(i, func) {
+		$.cssHooks[func].get = function(elem, computed) {
+			var transform = elem.transform || new $.transform(elem);
+			return transform.getAttr('matrix') || $.cssDefault[func];
+		};
 	});
 })(jQuery, this, this.document);

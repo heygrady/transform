@@ -213,6 +213,26 @@
 				0, 1, ty,
 				0, 0, 1
 			);
+		},
+		
+		/**
+		 * Translate on the X-axis
+		 * @param Number tx
+		 * @return Matrix
+		 * @link http://www.w3.org/TR/SVG/coords.html#TranslationDefined
+		 */
+		translateX: function (tx) {
+			return $.matrix.translate(tx);
+		},
+		
+		/**
+		 * Translate on the Y-axis
+		 * @param Number ty
+		 * @return Matrix
+		 * @link http://www.w3.org/TR/SVG/coords.html#TranslationDefined
+		 */
+		translateY: function (ty) {
+			return $.matrix.translate(0, ty);
 		}
 	});
 })(jQuery, this, this.document);
