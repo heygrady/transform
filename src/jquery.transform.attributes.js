@@ -116,16 +116,18 @@
 	if (typeof($.cssDefault) == 'undefined') {
 		$.cssDefault = {};
 	}
-	$.cssDefault.scale = [1, 1];
-	$.cssDefault.scaleX = 1;
-	$.cssDefault.scaleY = 1;
-	$.cssDefault.matrix = [1, 0, 0, 1, 0, 0];
-	$.cssDefault.origin = ['50%', '50%']; // TODO: allow this to be a function, like get
 	
-	$.cssDefault.reflect = [1, 0, 0, 1, 0, 0];
-	$.cssDefault.reflectX = [1, 0, 0, 1, 0, 0];
-	$.cssDefault.reflectXY = [1, 0, 0, 1, 0, 0];
-	$.cssDefault.reflectY = [1, 0, 0, 1, 0, 0];
+	$.extend($.cssDefault, {
+		scale: [1, 1],
+		scaleX: 1,
+		scaleY: 1,
+		matrix: [1, 0, 0, 1, 0, 0],
+		origin: ['50%', '50%'], // TODO: allow this to be a function, like get
+		reflect: [1, 0, 0, 1, 0, 0],
+		reflectX: [1, 0, 0, 1, 0, 0],
+		reflectXY: [1, 0, 0, 1, 0, 0],
+		reflectY: [1, 0, 0, 1, 0, 0]
+	});
 	
 	// Define functons with multiple values
 	if (typeof($.cssMultipleValues) == 'undefined') {
@@ -133,12 +135,14 @@
 	}
 	$.extend($.cssMultipleValues, {
 		matrix: 6,
-		
+		origin: {
+			length: 2,
+			duplicate: true
+		},
 		reflect: 6,
 		reflectX: 6,
 		reflectXY: 6,
 		reflectY: 6,
-		
 		scale: {
 			length: 2,
 			duplicate: true
