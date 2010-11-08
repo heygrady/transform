@@ -39,6 +39,9 @@
 	 */
 	var GRAD_RAD = Math.PI/200;
 	
+	
+	var rfxnum = /^([+\-]=)?([\d+.\-]+)(.*)$/;
+	
 	/**
 	 * Functions for converting angles
 	 * @var Object
@@ -103,6 +106,28 @@
 			 */
 			gradToRadian: function(grad) {
 				return grad * GRAD_RAD;
+			},
+			
+			/**
+			 * Convert an angle with a unit to a degree
+			 * @param String val angle with a unit
+			 * @return Number
+			 */
+			toDegree: function (val) {
+				var parts = rfxnum.exec(val);
+				if (parts) {
+					val = parseFloat( parts[2] );
+					switch (parts[3] || 'deg') {
+						case 'grad':
+							val = $.angle.gradToDegree(val);
+							break;
+						case 'rad':
+							val = $.angle.radianToDegree(val);
+							break;
+					}
+					return val;
+				}
+				return 0;
 			}
 		}
 	});

@@ -112,6 +112,17 @@
 		}
 	});
 	
+	// Define 
+	if (typeof($.cssAngle) == 'undefined') {
+		$.cssAngle = {};
+	}
+	$.extend($.cssAngle, {
+		rotate: true,
+		skew: true,
+		skewX: true,
+		skewY: true
+	});
+	
 	// Define default values
 	if (typeof($.cssDefault) == 'undefined') {
 		$.cssDefault = {};
@@ -151,9 +162,20 @@
 		translate: 2
 	});
 	
+	// specify unitless funcs
+	$.extend($.cssNumber, {
+		matrix: true,
+		reflect: true,
+		reflectX: true,
+		reflectXY: true,
+		reflectY: true,
+		scale: true,
+		scaleX: true,
+		scaleY: true
+	});
+	
 	// override all of the css functions
 	$.each($.transform.funcs, function(i, func) {
-		$.cssNumber[func] = true;
 		$.cssHooks[func] = {
 			set: function(elem, value) {
 				var transform = elem.transform || new $.transform(elem),

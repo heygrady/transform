@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+
+	<!-- Always force latest IE rendering engine (even in intranet) & Chrome Frame 
+			 Remove this if you use the .htaccess -->
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+
+	<title>test3</title>
+	<link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/3.2.0/build/cssreset/reset-min.css">
+	<link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/3.2.0/build/cssfonts/fonts-min.css">
+	
+	<style>
+		#container {
+			padding: 10px;
+		}
+		p {
+			margin-bottom: 20px;
+		}
+		.wrapper {
+			float: left;
+			display: inline;
+			background-color: #eeeeee;
+			height: 150px;
+			width: 150px;
+			margin: 0 10px 10px 0;
+		}
+		div.transform {
+			border: 1px solid #000000;
+			background-color: deeppink;
+			padding: 10px;
+			height: 128px;
+			width: 128px;
+		}
+	</style>
+</head>
+
+<body>
+	<div id="container">
+		<h1>Testing</h1>
+		<button id="prev">Prev</button>
+		<button id="next">Next</button>
+		<p><span id="step"></span>: <span id="text"></span> | <span id="result"></span></p>
+		<div class="wrapper">
+			<div class="transform">
+				<h2>Transform</h2>
+			</div>
+		</div>
+		<div class="wrapper">
+			<div class="transform">
+				<h2>Transform</h2>
+			</div>
+		</div>
+		<div class="wrapper">
+			<div class="transform">
+				<h2>Transform</h2>
+			</div>
+		</div>
+		
+		<div class="wrapper">
+			<img class="transform" src="http://www.doornpoort.co.za/wp-content/uploads/2009/12/cute-puppy-150x150.jpg" height="150" width="150" />	
+		</div>
+		<div class="wrapper">
+			<img class="transform" src="http://www.blogcdn.com/www.adjab.com/media/2006/04/kitten.jpg" height="150" width="150" />
+		</div>
+		<div class="wrapper">
+			<img class="transform" src="http://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Nuvola_apps_forward_arrow.svg/150px-Nuvola_apps_forward_arrow.svg.png" height="150" width="150" />
+		</div>
+	</div>
+	
+	
+	<!-- <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.js"></script> -->
+	<script src="js/jquery-1.4.3.js"></script>
+	<script src="../src/jquery.transform.js"></script>
+	<script src="../src/jquery.transform.attributes.js"></script>
+	<script src="../src/jquery.transform.animate.js"></script>
+	<script src="../src/jquery.angle.js"></script>
+	<script src="../src/jquery.matrix.js"></script>
+	<script src="../src/jquery.matrix.calculations.js"></script>
+	<script src="../src/jquery.matrix.functions.js"></script>
+	
+	<script>
+	(function ($) {
+		var $elem = $('.transform'),
+			$text = $('#text'),
+			$result = $('#result'),
+			$step = $('#step'),
+			current = 99,
+			auto = false;
+		
+		//$('#go').click(go);
+		$('#prev').click(prev);
+		$('#next').click(next);
+		function prev () {
+			current--;
+			$step.text(current + '');
+			go();
+		}
+		function next () {
+			current++;
+			$step.text(current + '');
+			go();
+		}
+		
+		function go() {
+			var tests = [
+				// Matrix
+				function () {
+					$text.text('Transform: Matrix');
+					$elem.transform({
+						// 15deg
+						matrix: '0.96592583, 0.25881905, -0.25881905, 0.96592583, 0, 0'
+					});
+				},
+				function () {
+					$text.text('Transform: Matrix as Array');
+					$elem.transform({
+						// 30deg
+						matrix: [0.86602540, 0.49999999, -0.49999999, 0.86602540, 0, 0]
+					});
+				},
+				function () {
+					$text.text('CSS: Matrix');
+					$elem.css({
+						//45deg
+						matrix: '0.70710678, 0.70710678, -0.70710678, 0.70710678, 0, 0'
+					});
+				},
+				function () {
+					$text.text('CSS: Matrix as Array');
+					$elem.css({
+						//60deg
+						matrix: [0.5, 0.866025404, -0.866025404, 0.5, 0, 0]
+					});
+				},
+				function () {
+					$text.text('Animate: Matrix');
+					$elem.animate({
+						//45deg
+						matrix: '0.70710678, 0.70710678, -0.70710678, 0.70710678, 0, 0'
+					}, {complete: function() {$result.text($elem.attr('data-transform'));}});
+				},
+				function () {
+					$text.text('Animate: Matrix as Array (per-property conflict)');
+					$elem.animate({
+						// 30deg
+						matrix: [0.86602540, 0.49999999, -0.49999999, 0.86602540, 0, 0]
+					}, {complete: function() {$result.text($elem.attr('data-transform'));}});
+				},
+				function () {
+					$text.text('Animate: Matrix as Nested Array');
+					$elem.animate({
+						// 15deg
+						matrix: [[0.96592583, 0.25881905, -0.25881905, 0.96592583, 0, 0]]
+					}, {complete: function() {$result.text($elem.attr('data-transform'));}});
+				},
+				function () {
+					$text.text('Reset');
+					$elem.transform({});
+				},
+					
+				// Reflect
+				function () {
+					$text.text('Transform: Reflect');
+					$elem.transform({reflect: true});
+				},
+				function () {
+					$text.text('CSS: Reflect');
+					$elem.css({reflect: true});
+				},
+				function () {
+					$text.text('Transform: ReflectX');
+					$elem.transform({reflectX: true});
+				},
+				function () {
+					$text.text('CSS: ReflectX');
+					$elem.css({reflectX: true});
+				},
+				function () {
+					$text.text('Transform: ReflectXY');
+					$elem.transform({reflectXY: true});
+				},
+				function () {
+					$text.text('CSS: ReflectXY');
+					$elem.css({reflectXY: true});
+				},
+				function () {
+					$text.text('Transform: ReflectY');
+					$elem.transform({reflectY: true});
+				},
+				function () {
+					$text.text('CSS: ReflectY');
+					$elem.css({reflectY: true});
+				},
+				function () {
+					$text.text('Transform: Reflect False');
+					$elem.transform({reflect: false});
+				},
+				function () {
+					$text.text('CSS: Reflect False');
+					$elem.css({reflect: false});
+				},
+				function () {
+					$text.text('Transform: ReflectX False');
+					$elem.transform({reflectX: false});
+				},
+				function () {
+					$text.text('CSS: ReflectX False');
+					$elem.css({reflectX: false});
+				},
+				function () {
+					$text.text('Transform: ReflectXY False');
+					$elem.transform({reflectXY: false});
+				},
+				function () {
+					$text.text('CSS: ReflectXY False');
+					$elem.css({reflectXY: false});
+				},
+				function () {
+					$text.text('Transform: ReflectY False');
+					$elem.transform({reflectY: false});
+				},
+				function () {
+					$text.text('CSS: ReflectY False');
+					$elem.css({reflectY: false});
+				},
+				function () {
+					$text.text('Reset');
+					$elem.transform({});
+				},
+				
+				// Animate Reflect
+				function () {
+					$text.text('Animate: Reflect');
+					$elem.animate({
+						reflect: true
+					}, {complete: function() {$result.text($elem.attr('data-transform'));}});
+				},
+				function () {
+					$text.text('Animate: Reflect False');
+					$elem.animate({
+						reflect: false
+					}, {complete: function() {$result.text($elem.attr('data-transform'));}});
+				},
+				function () {
+					$text.text('Animate: ReflectX');
+					$elem.animate({
+						reflectX: true
+					}, {complete: function() {$result.text($elem.attr('data-transform'));}});
+				},
+				function () {
+					$text.text('Animate: ReflectX False');
+					$elem.animate({
+						reflectX: false
+					}, {complete: function() {$result.text($elem.attr('data-transform'));}});
+				},
+				function () {
+					$text.text('Animate: ReflectXY');
+					$elem.animate({
+						reflectXY: true
+					}, {complete: function() {$result.text($elem.attr('data-transform'));}});
+				},
+				function () {
+					$text.text('Animate: ReflectXY False');
+					$elem.animate({
+						reflectXY: false
+					}, {complete: function() {$result.text($elem.attr('data-transform'));}});
+				},
+				function () {
+					$text.text('Animate: ReflectY');
+					$elem.animate({
+						reflectY: true
+					}, {complete: function() {$result.text($elem.attr('data-transform'));}});
+				},
+				function () {
+					$text.text('Animate: ReflectY False');
+					$elem.animate({
+						reflectY: false
+					}, {complete: function() {$result.text($elem.attr('data-transform'));}});
+				},
+				function () {
+					$text.text('Reset');
+					$elem.transform({});
+				},
+					
+				// Rotate
+				function () {
+					$text.text('Transform: Rotate');
+					$elem.transform({rotate: '15deg'});
+				},
+				function () {
+					$text.text('CSS: Rotate');
+					$elem.css({rotate: '30deg'});
+				},
+				function () {
+					$text.text('Animate: Rotate');
+					$elem.animate({
+						rotate: '45deg'
+					}, {complete: function() {$result.text($elem.attr('data-transform'));}});
+				},
+				function () {
+					$text.text('Transform: Rotate in grad');
+					$elem.transform({rotate: $.angle.degreeToGrad(60) + 'grad'});
+				},
+				function () {
+					$text.text('Transform: Rotate in rad');
+					$elem.transform({rotate: $.angle.degreeToRadian(75) + 'rad'});
+				},
+				function () {
+					$text.text('Animate: Rotate in rad');
+					$elem.animate({
+						rotate: $.angle.degreeToRadian(90) + 'rad'
+					}, {complete: function() {$result.text($elem.attr('data-transform'));}});
+				},
+				function () {
+					$text.text('Reset');
+					$elem.transform({});
+				},
+					
+				// Scale
+				function () {
+					$text.text('Transform: Scale with one value');
+					$elem.transform({scale: 0.125});
+				},
+				function () {
+					$text.text('CSS: Scale with one value');
+					$elem.css({scale: 0.25});
+				},
+				function () {
+					$text.text('Transform: Scale with two values');
+					$elem.transform({scale: '0.375, 0.375'});
+				},
+				function () {
+					$text.text('CSS: Scale with two values');
+					$elem.css({scale: '0.5, 0.5'});
+				},
+				function () {
+					$text.text('Transform: Scale with two values as array');
+					$elem.transform({scale: [0.625, 0.625]});
+				},
+				function () {
+					$text.text('CSS: Scale with two values as array');
+					$elem.css({scale: [0.75, 0.75]});
+				},
+				function () {
+					$text.text('Animate: Scale with one value');
+					$elem.animate({
+						scale: .875
+					}, {complete: function() {$result.text($elem.attr('data-transform'));}});
+				},
+				function () {
+					$text.text('Animate: Scale with two values');
+					$elem.animate({
+						scale: '1.125, 1.125'
+					}, {complete: function() {$result.text($elem.attr('data-transform'));}});
+				},
+				function () {
+					$text.text('Animate: Scale with two values as array (per-property conflict)');
+					$elem.animate({
+						scale: [1.25, 1.25]
+					}, {complete: function() {$result.text($elem.attr('data-transform'));}});
+				},
+				function () {
+					$text.text('Animate: Scale with two values as nested array');
+					$elem.animate({
+						scale: [[1, 1]]
+					}, {complete: function() {$result.text($elem.attr('data-transform'));}});
+				},
+				function () {
+					$text.text('Reset');
+					$elem.transform({});
+				},
+					
+				// ScaleX and ScaleY
+				function () {
+					$text.text('Transform: ScaleX');
+					$elem.transform({scaleX: 0.125});
+				},
+				function () {
+					$text.text('Transform: ScaleY');
+					$elem.transform({scaleY: 0.125});
+				},
+				function () {
+					$text.text('CSS: ScaleX');
+					$elem.css({scaleX: 0.25});
+				},
+				function () {
+					$text.text('CSS: ScaleY');
+					$elem.css({scaleY: 0.25});
+				},
+				function () {
+					$text.text('Animate: ScaleX');
+					$elem.animate({
+						scaleX: .5
+					}, {complete: function() {$result.text($elem.attr('data-transform'));}});
+				},
+				function () {
+					$text.text('Animate: ScaleY');
+					$elem.animate({
+						scaleY: .5
+					}, {complete: function() {$result.text($elem.attr('data-transform'));}});
+				},
+				function () {
+					$text.text('Reset');
+					$elem.transform({});
+				},
+				
+				//Skew
+				function () {
+					$text.text('Transform: Skew with one value');
+					$elem.transform({skew: '15deg'});
+				},
+				function () {
+					$text.text('CSS: Skew with one value');
+					$elem.css({skew: '30deg'});
+				},
+				function () {
+					$text.text('Transform: Skew with two values');
+					$elem.transform({skew: '30deg, 10deg'});
+				},
+				function () {
+					$text.text('CSS: Skew with two values');
+					$elem.css({skew: '45deg, 10deg'});
+				},
+				function () {
+					$text.text('Transform: Skew with two values as array');
+					$elem.transform({skew: ['60deg', '10deg']});
+				},
+				function () {
+					$text.text('CSS: Skew with two values as array');
+					$elem.css({skew: ['45deg', '10deg']});
+				},
+				function () {
+					$text.text('Animate: Skew with one value');
+					$elem.animate({
+						skew: '30deg'
+					}, {complete: function() {$result.text($elem.attr('data-transform'));}});
+				},
+				function () {
+					$text.text('Animate: Skew with two values');
+					$elem.animate({
+						skew: '15deg, 10deg'
+					}, {complete: function() {$result.text($elem.attr('data-transform'));}});
+				},
+				function () {
+					$text.text('Animate: Scale with two values as array (per-property conflict)');
+					$elem.animate({
+						skew: ['0deg', '10deg']
+					}, {complete: function() {$result.text($elem.attr('data-transform'));}});
+				},
+				function () {
+					$text.text('Animate: Scale with two values as nested array');
+					$elem.animate({
+						skew: [['-15deg', '10deg']]
+					}, {complete: function() {$result.text($elem.attr('data-transform'));}});
+				},
+				function () {
+					$text.text('Animate: Scale with two values as nested array using grad for first value');
+					$elem.animate({
+						skew: [[$.angle.degreeToGrad(15) + 'grad', '10deg']]
+					}, {complete: function() {$result.text($elem.attr('data-transform'));}});
+				},
+				function () {
+					$text.text('Animate: Scale with two values as nested array using grad for second value');
+					$elem.animate({
+						skew: [[ '10deg', $.angle.degreeToGrad(15) + 'grad']]
+					}, {complete: function() {$result.text($elem.attr('data-transform'));}});
+				},
+				function () {
+					$text.text('Animate: Scale with two values as nested array using grad for both value');
+					$elem.animate({
+						skew: [[ $.angle.degreeToGrad(15) + 'grad', $.angle.degreeToGrad(15) + 'grad']]
+					}, {complete: function() {$result.text($elem.attr('data-transform'));}});
+				},
+				function () {
+					$text.text('Reset');
+					$elem.transform({});
+				},
+				
+				// SkewX and SkewY
+				function () {
+					$text.text('Transform: SkewX');
+					$elem.transform({skewX: '15deg'});
+				},
+				function () {
+					$text.text('Transform: SkewY');
+					$elem.transform({skewY: '15deg'});
+				},
+				function () {
+					$text.text('CSS: SkewX');
+					$elem.css({skewX: '30deg'});
+				},
+				function () {
+					$text.text('CSS: SkewY');
+					$elem.css({skewY: '30deg'});
+				},
+				function () {
+					$text.text('Animate: ScaleX');
+					$elem.animate({
+						skewX: '-15deg'
+					}, {complete: function() {$result.text($elem.attr('data-transform'));}});
+				},
+				function () {
+					$text.text('Animate: SkewY');
+					$elem.animate({
+						skewY: '-15deg'
+					}, {complete: function() {$result.text($elem.attr('data-transform'));}});
+				},
+				function () {
+					$text.text('Animate: SkewY using grad');
+					$elem.animate({
+						skewY: $.angle.degreeToGrad(15) + 'grad'
+					}, {complete: function() {$result.text($elem.attr('data-transform'));}});
+				},
+				function () {
+					$text.text('Reset');
+					$elem.transform({});
+				},
+				
+				// Translate
+				function () {
+					$text.text('Transform: Translate with one value');
+					$elem.transform({translate: '25px'});
+				},
+				function () {
+					$text.text('CSS: Translate with one value');
+					$elem.css({translate: '50px'});
+				},
+				function () {
+					$text.text('Transform: Translate with two values');
+					$elem.transform({translate: '75px, 75px'});
+				},
+				function () {
+					$text.text('CSS: Translate with two values');
+					$elem.css({translate: '100px, 100px'});
+				},
+				function () {
+					$text.text('Transform: Translate with two values as array');
+					$elem.transform({translate: ['125px', '125px']});
+				},
+				function () {
+					$text.text('CSS: Translate with two values as array');
+					$elem.css({translate: ['150px', '150px']});
+				},
+				function () {
+					$text.text('Animate: Translate with one value');
+					$elem.animate({
+						translate: '125px'
+					}, {complete: function() {$result.text($elem.attr('data-transform'));}});
+				},
+				function () {
+					$text.text('Animate: Translate with two values');
+					$elem.animate({
+						translate: '100px, 100px'
+					}, {complete: function() {$result.text($elem.attr('data-transform'));}});
+				},
+				function () {
+					$text.text('Animate: Translate with two values as array (per-property conflict)');
+					$elem.animate({
+						translate: ['75px', '75px']
+					}, {complete: function() {$result.text($elem.attr('data-transform'));}});
+				},
+				function () {
+					$text.text('Animate: Translate with two values as nested array');
+					$elem.animate({
+						translate: [['50px', '50px']]
+					}, {complete: function() {$result.text($elem.attr('data-transform'));}});
+				},
+				function () {
+					$text.text('Animate: Translate with two values as nested array using em for first value');
+					$elem.animate({
+						translate: [['2.5em', '25px']]
+					}, {complete: function() {$result.text($elem.attr('data-transform'));}});
+				},
+				function () {
+					$text.text('Animate: Translate with two values as nested array using pt for first value and percentage for the second value');
+					$elem.animate({
+						translate: [['10pt', '20%']]
+					}, {complete: function() {$result.text($elem.attr('data-transform'));}});
+				},
+				function () {
+					$text.text('Reset');
+					$elem.transform({});
+				},
+				
+				// TranslateX and TranslateY
+				function () {
+					$text.text('Transform: TranslateX');
+					$elem.transform({translateX: '25px'});
+				},
+				function () {
+					$text.text('Transform: TranslateY');
+					$elem.transform({translateY: '25px'});
+				},
+				function () {
+					$text.text('CSS: TranslateX');
+					$elem.css({translateX: '50px'});
+				},
+				function () {
+					$text.text('CSS: TranslateY');
+					$elem.css({translateY: '50px'});
+				},
+				function () {
+					$text.text('Animate: TranslateX');
+					$elem.animate({
+						translateX: '25px'
+					}, {complete: function() {$result.text($elem.attr('data-transform'));}});
+				},
+				function () {
+					$text.text('Animate: TranslateY');
+					$elem.animate({
+						translateY: '25px'
+					}, {complete: function() {$result.text($elem.attr('data-transform'));}});
+				},
+				function () {
+					$text.text('Animate: TranslateY using em');
+					$elem.animate({
+						translateY: '3ex'
+					}, {complete: function() {$result.text($elem.attr('data-transform'));}});
+				},
+				function () {
+					$text.text('Reset');
+					$elem.transform({});
+				}
+			]
+			
+			if (tests[current]) {
+				tests[current]();
+			} else {
+				$text.text('Done!');
+				return;
+			}
+			
+			$result.text($elem.attr('data-transform'));
+			if (auto) {
+				next();
+			}
+		}
+		
+	})(jQuery);
+	</script>
+</body>
+</html>

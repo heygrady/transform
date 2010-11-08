@@ -18,18 +18,19 @@
 	 */
 	var _animate = $.fn.animate;
 	$.fn.animate = function( prop, speed, easing, callback ) {
-		var optall = jQuery.speed(speed, easing, callback);
+		var optall = $.speed(speed, easing, callback);
 		
 		// Capture multiple values
-		if (!jQuery.isEmptyObject(prop)) {
-			jQuery.each( prop, function( name, val ) {
-				if ($.cssMultipleValues[name]) {
-					if (typeof optall.multiple === 'undefined') {
-						optall.multiple = {};
-					}
-					
+		if (!$.isEmptyObject(prop)) {
+			if (typeof optall.original === 'undefined') {
+				optall.original = {};
+			}
+			$.each( prop, function( name, val ) {
+				if ($.cssMultipleValues[name]
+					|| $.cssAngle[name]
+					|| (!$.cssNumber[name] && $.transform.funcs[name])) {
 					// force the original values onto the optall
-					optall.multiple[name] = val.toString();
+					optall.original[name] = val.toString();
 					
 					// reduce to a unitless number
 					prop[name] = parseFloat(val);
@@ -38,17 +39,30 @@
 		}
 		
 		//NOTE: we edited prop above to trick animate
+		//NOTE: we pre-convert to an optall so we can doctor it
 		return _animate.apply(this, [arguments[0], optall]);
 	};
 	
+	var prop = 'paddingBottom';
+	function cur(elem, prop) {
+		if ( elem[prop] != null && (!elem.style || elem.style[prop] == null) ) {
+			//return elem[ prop ];
+		}
+
+		var r = parseFloat( $.css( elem, prop ) );
+		return r && r > -10000 ? r : 0;
+	}
+	
 	var _custom = $.fx.prototype.custom;
-	$.fx.prototype.custom = function() {
-		var multiple = $.cssMultipleValues[this.prop];
+	$.fx.prototype.custom = function(from, to, unit) {
+		var multiple = $.cssMultipleValues[this.prop],
+			angle = $.cssAngle[this.prop];
+			
 		if (multiple) {
 			this.values = [];
 			
 			// Pull out the known values
-			var values = this.options.multiple[this.prop],
+			var values = this.options.original[this.prop],
 				currentValues = $(this.elem).css(this.prop),
 				defaultValues = $.cssDefault[this.prop] || 0;
 			
@@ -74,7 +88,9 @@
 			}
 			
 			// calculate a start, end and unit for each new value
-			var start, parts, end, unit, fx = this;
+			var start, parts, end, //unit,
+				fx = this,
+				orig = $.style(fx.elem, prop);
 
 			$.each(values, function(i, val) {
 				// find a sensible start value
@@ -87,15 +103,37 @@
 				} else {
 					start = 0;
 				}
-				start = parseFloat(start);
+				
+				// Force the correct unit on the start
+				if (angle) {
+					start = $.angle.toDegree(start);
+				} else if (!$.cssNumber[fx.prop]) {
+					parts = rfxnum.exec($.trim(start));
+					if (parts[3]) {
+						$.style( fx.elem, prop, start);
+						start = cur(fx.elem, prop);
+						$.style( fx.elem, prop, orig);
+					}
+				} else {
+					start = parseFloat(start);
+				}
 				
 				// parse the value with a regex
-				parts = rfxnum.exec(val);
+				parts = rfxnum.exec($.trim(val));
 				
 				if (parts) {
 					// we found a sensible value and unit
 					end = parseFloat( parts[2] );
 					unit = parts[3] || "px"; //TODO: change to an appropriate default unit
+					
+					if (angle) {
+						end = $.angle.toDegree(end + unit);
+						unit = 'deg';
+					} else if (!$.cssNumber[fx.prop] && unit !== 'px') {
+						$.style( fx.elem, prop, (end || 1) + unit);
+						start = ((end || 1) / cur(fx.elem, prop)) * start;
+						$.style( fx.elem, prop, orig);
+					}
 					
 					// If a +=/-= token was provided, we're doing a relative animation
 					if (parts[1]) {
@@ -106,7 +144,7 @@
 					end = val;
 					unit = ''; 
 				}
-				
+								
 				// Save the values
 				fx.values.push({
 					start: start,
@@ -114,6 +152,42 @@
 					unit: unit
 				});				
 			});
+		} else if (angle) {
+			var val = this.options.original[this.prop],
+				currentVal = $(this.elem).css(this.prop),
+				defaultVal = $.cssDefault[this.prop] || 0,
+				fx = this;
+			
+			// normalize start on degrees
+			from = fx.start = $.angle.toDegree(currentVal || defaultVal);
+			
+			// normalize end on degrees
+			to = fx.end = $.angle.toDegree(val);
+			
+			//change units to degrees
+			unit = fx.unit = 'deg';
+		} else if (!$.cssNumber[this.prop] && $.inArray(this.prop, $.transform.funcs)) {
+			var currentVal = $(this.elem).css(this.prop),
+				defaultVal = $.cssDefault[this.prop] || 0,
+				parts, start, fx = this,
+				orig = $.style(fx.elem, prop);
+			
+			// normalize start to pixels
+			start = currentVal || defaultVal;
+			parts = rfxnum.exec(start);
+			if (parts && parts[3]) {
+				$.style( fx.elem, prop, start);
+				start = cur(fx.elem, prop);
+				$.style( fx.elem, prop, orig);
+			}
+			
+			// convert the start units to the end units
+			if (unit !== 'px') {
+				$.style( fx.elem, prop, (to || 1) + unit);
+				start = ((to || 1) / cur(fx.elem, prop)) * start;
+				$.style( fx.elem, prop, orig);
+			}
+			from = fx.start = start;
 		}
 		return _custom.apply(this, arguments);
 	};
@@ -143,10 +217,10 @@
 				($.fx.multipleValueStep[fx.prop] || $.fx.multipleValueStep._default)(fx);
 				funcs[fx.prop] = [];
 				$.each(fx.values, function(i, val) {
-					funcs[fx.prop].push(val.now);
+					funcs[fx.prop].push(val.now + ($.cssNumber[fx.prop] ? '' : val.unit));
 				});
 			} else {
-				funcs[fx.prop] = fx.now;
+				funcs[fx.prop] = fx.now + ($.cssNumber[fx.prop] ? '' : fx.unit);
 			}
 			
 			transform.exec(funcs, {preserve: true});

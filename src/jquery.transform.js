@@ -65,6 +65,12 @@
 	// store support in the jQuery Support object
 	$.support.csstransforms = supportCssTransforms();
 	
+	// IE9 public preview 6 requires the DOM names
+	if (vendorPrefix == '-ms-') {
+		transformProperty = 'msTransform';
+		transformOriginProperty = 'msTransformOrigin';
+	}
+	
 	/**
 	 * Class for creating cross-browser transformations
 	 * @constructor
@@ -115,6 +121,7 @@
 		 */
 		funcs: ['matrix', 'origin', 'reflect', 'reflectX', 'reflectXY', 'reflectY', 'rotate', 'scale', 'scaleX', 'scaleY', 'skew', 'skewX', 'skewY', 'translate', 'translateX', 'translateY'],
 		
+		//TODO: these regexes are not long for this world
 		rfunc: {
 			/**
 			 * @var Regex identifies functions that require an angle unit
@@ -175,8 +182,7 @@
 				funcs = $.extend(true, {}, funcs); // copy the object to prevent weirdness
 			}
 			
-			// Record the custom attributes on the element itself (helps out
-			//	the animator)
+			// Record the custom attributes on the element itself
 			this.setAttrs(funcs);
 			
 			// apply the funcs
@@ -219,13 +225,29 @@
 				tempMatrix,
 				args;
 			
+			var elem = this.$elem[0];
+			function normalPixels(val) {
+				return toPx(elem, val);
+			}
+			
 			for (var func in funcs) {
 				if ($.matrix[func]) {
-					args = $.isArray(funcs[func]) ? funcs[func] : [funcs[func]];
+					switch ($.type(funcs[func])) {
+						case 'array': args = funcs[func]; break;
+						case 'string': args = $.map(funcs[func].split(','), $.trim);break;
+						default: args = [funcs[func]];
+					}
 					
-					// strip the units
-					// TODO: should probably convert the units properly instead of just stripping them
-					args = $.map(args, stripUnits);
+					if ($.cssAngle[func]) {
+						// normalize on degrees
+						args = $.map(args, $.angle.toDegree);						
+					} else if (!$.cssNumber[func]) {
+						// normalize to pixels
+						args = $.map(args, normalPixels);
+					} else {
+						// strip units
+						args = $.map(args, stripUnits);
+					}
 					
 					// TODO: translation and origin should be applied last
 					// TODO: should hold translations until the extreme end
@@ -267,7 +289,7 @@
 				var matrixFilter = 'progid:DXImageTransform.Microsoft.Matrix(' +
 						'M11=' + a + ', M12=' + c + ', M21=' + b + ', M22=' + d +
 						', sizingMethod=\'auto expand\'' + filterType + ')';
-				var filter = style.filter || jQuery.curCSS( this.$elem[0], "filter" ) || "";
+				var filter = style.filter || $.curCSS( this.$elem[0], "filter" ) || "";
 				style.filter = rmatrix.test(filter) ? filter.replace(rmatrix, matrixFilter) : filter ? filter + ' ' + matrixFilter : matrixFilter;
 				
 				// Let's know that we're applying post matrix fixes and the height/width will be static for a bit
@@ -334,32 +356,22 @@
 		 * @param Mixed value
 		 */
 		createTransformFunc: function(func, value) {
-			if ($.transform.rfunc.reflect.test(func)) {
-				// let's fake reflection
-				// TODO: why would value be false?
-				var matrix = value ? $.matrix[func]() : $.matrix.identity(),
-					a = matrix.e(1,1),
-					b = matrix.e(2,1),
-					c = matrix.e(1,2),
-					d = matrix.e(2,2);
-				return 'matrix(' + a + ', ' + b + ', ' + c + ', ' + d + ', 0, 0)';
+			if (func.substr(0, 7) === 'reflect') {
+				// let's fake reflection, false value 
+				// falsey sets an identity matrix
+				var m = value ? $.matrix[func]() : $.matrix.identity();
+				return 'matrix(' + m.e(1,1) + ', ' + m.e(2,1) + ', ' + m.e(1,2) + ', ' + m.e(2,2) + ', 0, 0)';
 			}
 			
-			value = _correctUnits(func, value);
+			//value = _correctUnits(func, value);
 			
-			if  (!$.isArray(value)) {
-				return func + '(' + value + ')';
-			} else if (func == 'matrix') {
+			if (func == 'matrix') {
 				if (vendorPrefix === '-moz-' && value[4]) {
-					value[4] = value[4] +'px';
+					value[4] = value[4] ? value[4] + 'px' : 0;
+					value[5] = value[5] ? value[5] + 'px' : 0;
 				}
-				if (vendorPrefix === '-moz-' && value[5]) {
-					value[5] = value[5] +'px';
-				}
-				return 'matrix(' + value[0] + ', ' + value[1] + ', ' + value[2] + ', ' + value[3] + ', ' + (value[4] || 0) + ', ' + (value[5] || 0) + ')';
-			} else {
-				return func + '(' + value[0] + ', ' + value[1] + ')';
 			}
+			return func + '(' + ($.isArray(value) ? value.join(', ') : value) + ')';
 		},
 		
 		/**
@@ -412,36 +424,27 @@
 	 * @param Mixed value
 	 */
 	var rfxnum = /^([\+\-]=)?([\d+.\-]+)(.*)$/;
-	function _correctUnits(func, value) {
-		var result = !$.isArray(value)? [value] : value,
-			rangle = $.transform.rfunc.angle,
-			rlength = $.transform.rfunc.length;
-		
-		for (var i = 0, len = result.length; i < len; i++) {
-			var parts = rfxnum.exec(result[i]),
-				unit = '';
+	function toPx(elem, val) {
+		var parts = rfxnum.exec($.trim(val)),
+			prop = 'paddingBottom',
+			orig = $.style( elem, prop );
 			
-			// Use an appropriate unit
-			if (rangle.test(func)) {
-				unit = 'deg';
-				
-				// remove nonsense units
-				if (parts[3] && !$.angle.runit.test(parts[3])) {
-					parts[3] = null;
-				}
-			} else if (rlength.test(func)) {
-				unit = 'px';
-			}
-			
-			// ensure a value and appropriate unit
-			if (!parts) {
-				result[i] = 0 + unit;
-			} else if(!parts[3]) {
-				result[i] += unit;
-			}
-			
+		if (parts[3]) {
+			$.style( elem, prop, val );
+			val = cur( elem, prop );
+			$.style( elem, prop, orig );
+			return val;
 		}
-		return len == 1 ? result[0] : result;
+		return parseFloat( val );
+	}
+	
+	function cur(elem, prop) {
+		if ( elem[prop] != null && (!elem.style || elem.style[prop] == null) ) {
+			return elem[ prop ];
+		}
+
+		var r = parseFloat( $.css( elem, prop ) );
+		return r && r > -10000 ? r : 0;
 	}
 })(jQuery, this, this.document);
 

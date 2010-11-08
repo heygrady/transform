@@ -1,0 +1,9 @@
+NOTES:
+- units should now be required
+- animate needs to mangle units
+- rotate, skew needs to convert units
+	- for animate
+	- for IE
+- origin needs to convert units including percentage
+	- for animate
+	- for IE

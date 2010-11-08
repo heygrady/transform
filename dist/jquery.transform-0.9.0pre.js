@@ -6,7 +6,7 @@
  * Dual licensed under the MIT or GPL Version 2 licenses.
  * http://jquery.org/license
  * 
- * Date: Sun Oct 24 23:13:00 2010 -0700
+ * Date: Sun Oct 24 23:27:27 2010 -0700
  */
 ///////////////////////////////////////////////////////
 // Transform
@@ -65,6 +65,12 @@
 	// store support in the jQuery Support object
 	$.support.csstransforms = supportCssTransforms();
 	
+	// IE9 public preview 6 requires the DOM names
+	if (vendorPrefix == '-ms-') {
+		transformProperty = 'msTransform';
+		transformOriginProperty = 'msTransformOrigin';
+	}
+	
 	/**
 	 * Class for creating cross-browser transformations
 	 * @constructor
@@ -115,6 +121,7 @@
 		 */
 		funcs: ['matrix', 'origin', 'reflect', 'reflectX', 'reflectXY', 'reflectY', 'rotate', 'scale', 'scaleX', 'scaleY', 'skew', 'skewX', 'skewY', 'translate', 'translateX', 'translateY'],
 		
+		//TODO: these regexes are not long for this world
 		rfunc: {
 			/**
 			 * @var Regex identifies functions that require an angle unit
@@ -175,8 +182,7 @@
 				funcs = $.extend(true, {}, funcs); // copy the object to prevent weirdness
 			}
 			
-			// Record the custom attributes on the element itself (helps out
-			//	the animator)
+			// Record the custom attributes on the element itself
 			this.setAttrs(funcs);
 			
 			// apply the funcs
@@ -219,13 +225,29 @@
 				tempMatrix,
 				args;
 			
+			var elem = this.$elem[0];
+			function normalPixels(val) {
+				return toPx(elem, val);
+			}
+			
 			for (var func in funcs) {
 				if ($.matrix[func]) {
-					args = $.isArray(funcs[func]) ? funcs[func] : [funcs[func]];
+					switch ($.type(funcs[func])) {
+						case 'array': args = funcs[func]; break;
+						case 'string': args = $.map(funcs[func].split(','), $.trim);break;
+						default: args = [funcs[func]];
+					}
 					
-					// strip the units
-					// TODO: should probably convert the units properly instead of just stripping them
-					args = $.map(args, stripUnits);
+					if ($.cssAngle[func]) {
+						// normalize on degrees
+						args = $.map(args, $.angle.toDegree);						
+					} else if (!$.cssNumber[func]) {
+						// normalize to pixels
+						args = $.map(args, normalPixels);
+					} else {
+						// strip units
+						args = $.map(args, stripUnits);
+					}
 					
 					// TODO: translation and origin should be applied last
 					// TODO: should hold translations until the extreme end
@@ -267,7 +289,7 @@
 				var matrixFilter = 'progid:DXImageTransform.Microsoft.Matrix(' +
 						'M11=' + a + ', M12=' + c + ', M21=' + b + ', M22=' + d +
 						', sizingMethod=\'auto expand\'' + filterType + ')';
-				var filter = style.filter || jQuery.curCSS( this.$elem[0], "filter" ) || "";
+				var filter = style.filter || $.curCSS( this.$elem[0], "filter" ) || "";
 				style.filter = rmatrix.test(filter) ? filter.replace(rmatrix, matrixFilter) : filter ? filter + ' ' + matrixFilter : matrixFilter;
 				
 				// Let's know that we're applying post matrix fixes and the height/width will be static for a bit
@@ -334,32 +356,22 @@
 		 * @param Mixed value
 		 */
 		createTransformFunc: function(func, value) {
-			if ($.transform.rfunc.reflect.test(func)) {
-				// let's fake reflection
-				// TODO: why would value be false?
-				var matrix = value ? $.matrix[func]() : $.matrix.identity(),
-					a = matrix.e(1,1),
-					b = matrix.e(2,1),
-					c = matrix.e(1,2),
-					d = matrix.e(2,2);
-				return 'matrix(' + a + ', ' + b + ', ' + c + ', ' + d + ', 0, 0)';
+			if (func.substr(0, 7) === 'reflect') {
+				// let's fake reflection, false value 
+				// falsey sets an identity matrix
+				var m = value ? $.matrix[func]() : $.matrix.identity();
+				return 'matrix(' + m.e(1,1) + ', ' + m.e(2,1) + ', ' + m.e(1,2) + ', ' + m.e(2,2) + ', 0, 0)';
 			}
 			
-			value = _correctUnits(func, value);
+			//value = _correctUnits(func, value);
 			
-			if  (!$.isArray(value)) {
-				return func + '(' + value + ')';
-			} else if (func == 'matrix') {
+			if (func == 'matrix') {
 				if (vendorPrefix === '-moz-' && value[4]) {
-					value[4] = value[4] +'px';
+					value[4] = value[4] ? value[4] + 'px' : 0;
+					value[5] = value[5] ? value[5] + 'px' : 0;
 				}
-				if (vendorPrefix === '-moz-' && value[5]) {
-					value[5] = value[5] +'px';
-				}
-				return 'matrix(' + value[0] + ', ' + value[1] + ', ' + value[2] + ', ' + value[3] + ', ' + (value[4] || 0) + ', ' + (value[5] || 0) + ')';
-			} else {
-				return func + '(' + value[0] + ', ' + value[1] + ')';
 			}
+			return func + '(' + ($.isArray(value) ? value.join(', ') : value) + ')';
 		},
 		
 		/**
@@ -412,36 +424,27 @@
 	 * @param Mixed value
 	 */
 	var rfxnum = /^([\+\-]=)?([\d+.\-]+)(.*)$/;
-	function _correctUnits(func, value) {
-		var result = !$.isArray(value)? [value] : value,
-			rangle = $.transform.rfunc.angle,
-			rlength = $.transform.rfunc.length;
-		
-		for (var i = 0, len = result.length; i < len; i++) {
-			var parts = rfxnum.exec(result[i]),
-				unit = '';
+	function toPx(elem, val) {
+		var parts = rfxnum.exec($.trim(val)),
+			prop = 'paddingBottom',
+			orig = $.style( elem, prop );
 			
-			// Use an appropriate unit
-			if (rangle.test(func)) {
-				unit = 'deg';
-				
-				// remove nonsense units
-				if (parts[3] && !$.angle.runit.test(parts[3])) {
-					parts[3] = null;
-				}
-			} else if (rlength.test(func)) {
-				unit = 'px';
-			}
-			
-			// ensure a value and appropriate unit
-			if (!parts) {
-				result[i] = 0 + unit;
-			} else if(!parts[3]) {
-				result[i] += unit;
-			}
-			
+		if (parts[3]) {
+			$.style( elem, prop, val );
+			val = cur( elem, prop );
+			$.style( elem, prop, orig );
+			return val;
 		}
-		return len == 1 ? result[0] : result;
+		return parseFloat( val );
+	}
+	
+	function cur(elem, prop) {
+		if ( elem[prop] != null && (!elem.style || elem.style[prop] == null) ) {
+			return elem[ prop ];
+		}
+
+		var r = parseFloat( $.css( elem, prop ) );
+		return r && r > -10000 ? r : 0;
 	}
 })(jQuery, this, this.document);
 
@@ -682,6 +685,17 @@
 		}
 	});
 	
+	// Define 
+	if (typeof($.cssAngle) == 'undefined') {
+		$.cssAngle = {};
+	}
+	$.extend($.cssAngle, {
+		rotate: true,
+		skew: true,
+		skewX: true,
+		skewY: true
+	});
+	
 	// Define default values
 	if (typeof($.cssDefault) == 'undefined') {
 		$.cssDefault = {};
@@ -721,9 +735,20 @@
 		translate: 2
 	});
 	
+	// specify unitless funcs
+	$.extend($.cssNumber, {
+		matrix: true,
+		reflect: true,
+		reflectX: true,
+		reflectXY: true,
+		reflectY: true,
+		scale: true,
+		scaleX: true,
+		scaleY: true
+	});
+	
 	// override all of the css functions
 	$.each($.transform.funcs, function(i, func) {
-		$.cssNumber[func] = true;
 		$.cssHooks[func] = {
 			set: function(elem, value) {
 				var transform = elem.transform || new $.transform(elem),
@@ -765,18 +790,19 @@
 	 */
 	var _animate = $.fn.animate;
 	$.fn.animate = function( prop, speed, easing, callback ) {
-		var optall = jQuery.speed(speed, easing, callback);
+		var optall = $.speed(speed, easing, callback);
 		
 		// Capture multiple values
-		if (!jQuery.isEmptyObject(prop)) {
-			jQuery.each( prop, function( name, val ) {
-				if ($.cssMultipleValues[name]) {
-					if (typeof optall.multiple === 'undefined') {
-						optall.multiple = {};
-					}
-					
+		if (!$.isEmptyObject(prop)) {
+			if (typeof optall.original === 'undefined') {
+				optall.original = {};
+			}
+			$.each( prop, function( name, val ) {
+				if ($.cssMultipleValues[name]
+					|| $.cssAngle[name]
+					|| (!$.cssNumber[name] && $.transform.funcs[name])) {
 					// force the original values onto the optall
-					optall.multiple[name] = val.toString();
+					optall.original[name] = val.toString();
 					
 					// reduce to a unitless number
 					prop[name] = parseFloat(val);
@@ -785,17 +811,30 @@
 		}
 		
 		//NOTE: we edited prop above to trick animate
+		//NOTE: we pre-convert to an optall so we can doctor it
 		return _animate.apply(this, [arguments[0], optall]);
 	};
 	
+	var prop = 'paddingBottom';
+	function cur(elem, prop) {
+		if ( elem[prop] != null && (!elem.style || elem.style[prop] == null) ) {
+			//return elem[ prop ];
+		}
+
+		var r = parseFloat( $.css( elem, prop ) );
+		return r && r > -10000 ? r : 0;
+	}
+	
 	var _custom = $.fx.prototype.custom;
-	$.fx.prototype.custom = function() {
-		var multiple = $.cssMultipleValues[this.prop];
+	$.fx.prototype.custom = function(from, to, unit) {
+		var multiple = $.cssMultipleValues[this.prop],
+			angle = $.cssAngle[this.prop];
+			
 		if (multiple) {
 			this.values = [];
 			
 			// Pull out the known values
-			var values = this.options.multiple[this.prop],
+			var values = this.options.original[this.prop],
 				currentValues = $(this.elem).css(this.prop),
 				defaultValues = $.cssDefault[this.prop] || 0;
 			
@@ -821,7 +860,9 @@
 			}
 			
 			// calculate a start, end and unit for each new value
-			var start, parts, end, unit, fx = this;
+			var start, parts, end, //unit,
+				fx = this,
+				orig = $.style(fx.elem, prop);
 
 			$.each(values, function(i, val) {
 				// find a sensible start value
@@ -834,15 +875,37 @@
 				} else {
 					start = 0;
 				}
-				start = parseFloat(start);
+				
+				// Force the correct unit on the start
+				if (angle) {
+					start = $.angle.toDegree(start);
+				} else if (!$.cssNumber[fx.prop]) {
+					parts = rfxnum.exec($.trim(start));
+					if (parts[3]) {
+						$.style( fx.elem, prop, start);
+						start = cur(fx.elem, prop);
+						$.style( fx.elem, prop, orig);
+					}
+				} else {
+					start = parseFloat(start);
+				}
 				
 				// parse the value with a regex
-				parts = rfxnum.exec(val);
+				parts = rfxnum.exec($.trim(val));
 				
 				if (parts) {
 					// we found a sensible value and unit
 					end = parseFloat( parts[2] );
 					unit = parts[3] || "px"; //TODO: change to an appropriate default unit
+					
+					if (angle) {
+						end = $.angle.toDegree(end + unit);
+						unit = 'deg';
+					} else if (!$.cssNumber[fx.prop] && unit !== 'px') {
+						$.style( fx.elem, prop, (end || 1) + unit);
+						start = ((end || 1) / cur(fx.elem, prop)) * start;
+						$.style( fx.elem, prop, orig);
+					}
 					
 					// If a +=/-= token was provided, we're doing a relative animation
 					if (parts[1]) {
@@ -853,7 +916,7 @@
 					end = val;
 					unit = ''; 
 				}
-				
+								
 				// Save the values
 				fx.values.push({
 					start: start,
@@ -861,6 +924,42 @@
 					unit: unit
 				});				
 			});
+		} else if (angle) {
+			var val = this.options.original[this.prop],
+				currentVal = $(this.elem).css(this.prop),
+				defaultVal = $.cssDefault[this.prop] || 0,
+				fx = this;
+			
+			// normalize start on degrees
+			from = fx.start = $.angle.toDegree(currentVal || defaultVal);
+			
+			// normalize end on degrees
+			to = fx.end = $.angle.toDegree(val);
+			
+			//change units to degrees
+			unit = fx.unit = 'deg';
+		} else if (!$.cssNumber[this.prop] && $.inArray(this.prop, $.transform.funcs)) {
+			var currentVal = $(this.elem).css(this.prop),
+				defaultVal = $.cssDefault[this.prop] || 0,
+				parts, start, fx = this,
+				orig = $.style(fx.elem, prop);
+			
+			// normalize start to pixels
+			start = currentVal || defaultVal;
+			parts = rfxnum.exec(start);
+			if (parts && parts[3]) {
+				$.style( fx.elem, prop, start);
+				start = cur(fx.elem, prop);
+				$.style( fx.elem, prop, orig);
+			}
+			
+			// convert the start units to the end units
+			if (unit !== 'px') {
+				$.style( fx.elem, prop, (to || 1) + unit);
+				start = ((to || 1) / cur(fx.elem, prop)) * start;
+				$.style( fx.elem, prop, orig);
+			}
+			from = fx.start = start;
 		}
 		return _custom.apply(this, arguments);
 	};
@@ -890,10 +989,10 @@
 				($.fx.multipleValueStep[fx.prop] || $.fx.multipleValueStep._default)(fx);
 				funcs[fx.prop] = [];
 				$.each(fx.values, function(i, val) {
-					funcs[fx.prop].push(val.now);
+					funcs[fx.prop].push(val.now + ($.cssNumber[fx.prop] ? '' : val.unit));
 				});
 			} else {
-				funcs[fx.prop] = fx.now;
+				funcs[fx.prop] = fx.now + ($.cssNumber[fx.prop] ? '' : fx.unit);
 			}
 			
 			transform.exec(funcs, {preserve: true});
@@ -976,6 +1075,9 @@
 	 */
 	var GRAD_RAD = Math.PI/200;
 	
+	
+	var rfxnum = /^([+\-]=)?([\d+.\-]+)(.*)$/;
+	
 	/**
 	 * Functions for converting angles
 	 * @var Object
@@ -1040,6 +1142,28 @@
 			 */
 			gradToRadian: function(grad) {
 				return grad * GRAD_RAD;
+			},
+			
+			/**
+			 * Convert an angle with a unit to a degree
+			 * @param String val angle with a unit
+			 * @return Number
+			 */
+			toDegree: function (val) {
+				var parts = rfxnum.exec(val);
+				if (parts) {
+					val = parseFloat( parts[2] );
+					switch (parts[3] || 'deg') {
+						case 'grad':
+							val = $.angle.gradToDegree(val);
+							break;
+						case 'rad':
+							val = $.angle.radianToDegree(val);
+							break;
+					}
+					return val;
+				}
+				return 0;
 			}
 		}
 	});
@@ -1620,7 +1744,6 @@
 				a, c,
 				b, d
 			);
-		
 		},
 		
 		/**
