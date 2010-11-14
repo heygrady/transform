@@ -82,11 +82,11 @@
 	
 	<script>
 	(function ($) {
-		var $elem = $('.transform'),
+		var $elem = $('.transform:last'),
 			$text = $('#text'),
 			$result = $('#result'),
 			$step = $('#step'),
-			current = 99,
+			current = -1,
 			auto = false;
 		
 		//$('#go').click(go);
@@ -614,15 +614,87 @@
 					}, {complete: function() {$result.text($elem.attr('data-transform'));}});
 				},
 				function () {
-					$text.text('Animate: TranslateY using em');
+					$text.text('Animate: TranslateY using ex');
 					$elem.animate({
 						translateY: '3ex'
 					}, {complete: function() {$result.text($elem.attr('data-transform'));}});
 				},
 				function () {
+					$text.text('Animate: TranslateY using em');
+					$elem.animate({
+						translateY: '4em'
+					}, {complete: function() {$result.text($elem.attr('data-transform'));}});
+				},
+				function () {
 					$text.text('Reset');
 					$elem.transform({});
-				}
+				},
+				
+				// Origin
+				function () {
+					$text.text('Transform: Origin with one value');
+					$elem.transform({rotate: '45deg', origin: '25px'});
+				},
+				function () {
+					$text.text('CSS: Origin with one value');
+					$elem.css({rotate: '45deg', origin: '50px'});
+				},
+				function () {
+					$text.text('Transform: Origin with two values');
+					$elem.transform({rotate: '45deg', origin: '25px, 50px'});
+				},
+				function () {
+					$text.text('CSS: Origin with two values');
+					$elem.css({rotate: '45deg', origin: '50px, 50px'});
+				},
+				function () {
+					$text.text('Transform: Origin with two values as array');
+					$elem.transform({rotate: '45deg', origin: ['75px', '50px']});
+				},
+				function () {
+					$text.text('CSS: Origin with two values as array');
+					$elem.css({rotate: '45deg', origin: ['75px', '75px']});
+				},
+				function () {
+					$text.text('Animate: Origin with one value');
+					$elem.animate({
+						rotate: '45deg', origin: '50px'
+					}, {complete: function() {$result.text($elem.attr('data-transform'));}});
+				},
+				function () {
+					$text.text('Animate: Origin with two values');
+					$elem.animate({
+						rotate: '45deg', origin: '75px, 25px'
+					}, {complete: function() {$result.text($elem.attr('data-transform'));}});
+				},
+				function () {
+					$text.text('Animate: Origin with two values as array (per-property conflict)');
+					$elem.animate({
+						rotate: '45deg', origin: ['50px', '75px']
+					}, {complete: function() {$result.text($elem.attr('data-transform'));}});
+				},
+				function () {
+					$text.text('Animate: Origin with two values as nested array');
+					$elem.animate({
+						rotate: '45deg', origin: [['75px', '50px']]
+					}, {complete: function() {$result.text($elem.attr('data-transform'));}});
+				},
+				function () {
+					$text.text('Animate: Origin with two values as nested array using em for first value');
+					$elem.animate({
+						rotate: '45deg', origin: [['7.5em', '75px']]
+					}, {complete: function() {$result.text($elem.attr('data-transform'));}});
+				},
+				function () {
+					$text.text('Animate: Origin with two values as nested array using pt for first value and percentage for the second value');
+					$elem.animate({
+						rotate: '45deg', origin: [['100pt', '75%']]
+					}, {complete: function() {$result.text($elem.attr('data-transform'));}});
+				},
+				function () {
+					$text.text('Reset');
+					$elem.transform({});
+				},
 			]
 			
 			if (tests[current]) {

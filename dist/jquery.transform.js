@@ -6,7 +6,7 @@
  * Dual licensed under the MIT or GPL Version 2 licenses.
  * http://jquery.org/license
  * 
- * Date: Sun Oct 24 23:27:27 2010 -0700
+ * Date: Sun Nov 7 23:14:31 2010 -0800
  */
 ///////////////////////////////////////////////////////
 // Transform
@@ -800,7 +800,7 @@
 			$.each( prop, function( name, val ) {
 				if ($.cssMultipleValues[name]
 					|| $.cssAngle[name]
-					|| (!$.cssNumber[name] && $.transform.funcs[name])) {
+					|| (!$.cssNumber[name] && $.inArray(name, $.transform.funcs))) {
 					// force the original values onto the optall
 					optall.original[name] = val.toString();
 					
@@ -829,9 +829,14 @@
 	$.fx.prototype.custom = function(from, to, unit) {
 		var multiple = $.cssMultipleValues[this.prop],
 			angle = $.cssAngle[this.prop];
-			
-		if (multiple) {
+		
+		//TODO: simply check for the existence of CSS Hooks?
+		if (multiple || (!$.cssNumber[this.prop] && $.inArray(this.prop, $.transform.funcs))) {
 			this.values = [];
+			
+			if (!multiple) {
+				multiple = 1;
+			}
 			
 			// Pull out the known values
 			var values = this.options.original[this.prop],
@@ -924,42 +929,6 @@
 					unit: unit
 				});				
 			});
-		} else if (angle) {
-			var val = this.options.original[this.prop],
-				currentVal = $(this.elem).css(this.prop),
-				defaultVal = $.cssDefault[this.prop] || 0,
-				fx = this;
-			
-			// normalize start on degrees
-			from = fx.start = $.angle.toDegree(currentVal || defaultVal);
-			
-			// normalize end on degrees
-			to = fx.end = $.angle.toDegree(val);
-			
-			//change units to degrees
-			unit = fx.unit = 'deg';
-		} else if (!$.cssNumber[this.prop] && $.inArray(this.prop, $.transform.funcs)) {
-			var currentVal = $(this.elem).css(this.prop),
-				defaultVal = $.cssDefault[this.prop] || 0,
-				parts, start, fx = this,
-				orig = $.style(fx.elem, prop);
-			
-			// normalize start to pixels
-			start = currentVal || defaultVal;
-			parts = rfxnum.exec(start);
-			if (parts && parts[3]) {
-				$.style( fx.elem, prop, start);
-				start = cur(fx.elem, prop);
-				$.style( fx.elem, prop, orig);
-			}
-			
-			// convert the start units to the end units
-			if (unit !== 'px') {
-				$.style( fx.elem, prop, (to || 1) + unit);
-				start = ((to || 1) / cur(fx.elem, prop)) * start;
-				$.style( fx.elem, prop, orig);
-			}
-			from = fx.start = start;
 		}
 		return _custom.apply(this, arguments);
 	};
@@ -985,7 +954,7 @@
 			var transform = fx.elem.transform || new $.transform(fx.elem),
 				funcs = {};
 			
-			if ($.cssMultipleValues[func]) {
+			if ($.cssMultipleValues[func] || (!$.cssNumber[func] && $.inArray(func, $.transform.funcs))) {
 				($.fx.multipleValueStep[fx.prop] || $.fx.multipleValueStep._default)(fx);
 				funcs[fx.prop] = [];
 				$.each(fx.values, function(i, val) {
