@@ -95,6 +95,7 @@
 			// calculate a start, end and unit for each new value
 			var start, parts, end, //unit,
 				fx = this,
+				transform = fx.elem.transform;
 				orig = $.style(fx.elem, prop);
 
 			$.each(values, function(i, val) {
@@ -114,14 +115,17 @@
 					start = $.angle.toDegree(start);
 				} else if (!$.cssNumber[fx.prop]) {
 					parts = rfxnum.exec($.trim(start));
-					if (parts[3]) {
-						$.style( fx.elem, prop, start);
-						start = cur(fx.elem, prop);
-						$.style( fx.elem, prop, orig);
+					if (parts[3] && parts[3] !== 'px') {
+						if (parts[3] === '%') {
+							start = parseFloat( parts[2] ) / 100 * transform['safeOuter' + (i ? 'Height' : 'Width')]();
+						} else {
+							$.style( fx.elem, prop, start);
+							start = cur(fx.elem, prop);
+							$.style( fx.elem, prop, orig);
+						}
 					}
-				} else {
-					start = parseFloat(start);
 				}
+				start = parseFloat(start);
 				
 				// parse the value with a regex
 				parts = rfxnum.exec($.trim(val));
@@ -134,6 +138,8 @@
 					if (angle) {
 						end = $.angle.toDegree(end + unit);
 						unit = 'deg';
+					} else if (!$.cssNumber[fx.prop] && unit === '%') {
+						start = (start / transform['safeOuter' + (i ? 'Height' : 'Width')]()) * 100;
 					} else if (!$.cssNumber[fx.prop] && unit !== 'px') {
 						$.style( fx.elem, prop, (end || 1) + unit);
 						start = ((end || 1) / cur(fx.elem, prop)) * start;

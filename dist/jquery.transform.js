@@ -1,12 +1,12 @@
 /*!
- * jQuery 2d Transform v0.9.0pre
+ * jQuery 2d Transform v0.9.0
  * http://wiki.github.com/heygrady/transform/
  *
  * Copyright 2010, Grady Kuhnline
  * Dual licensed under the MIT or GPL Version 2 licenses.
  * http://jquery.org/license
  * 
- * Date: Sun Nov 7 23:14:31 2010 -0800
+ * Date: Sun Nov 14 13:45:35 2010 -0800
  */
 ///////////////////////////////////////////////////////
 // Transform
@@ -15,7 +15,9 @@
 	/**
 	 * @var Regex identify the matrix filter in IE
 	 */
-	var rmatrix = /progid:DXImageTransform\.Microsoft\.Matrix\(.*?\)/;
+	var rmatrix = /progid:DXImageTransform\.Microsoft\.Matrix\(.*?\)/,
+		rfxnum = /^([\+\-]=)?([\d+.\-]+)(.*)$/,
+		rperc = /%/;
 	
 	// Steal some code from Modernizr
 	var m = document.createElement( 'modernizr' ),
@@ -119,30 +121,7 @@
 		/**
 		 * @var Array list of all valid transform functions
 		 */
-		funcs: ['matrix', 'origin', 'reflect', 'reflectX', 'reflectXY', 'reflectY', 'rotate', 'scale', 'scaleX', 'scaleY', 'skew', 'skewX', 'skewY', 'translate', 'translateX', 'translateY'],
-		
-		//TODO: these regexes are not long for this world
-		rfunc: {
-			/**
-			 * @var Regex identifies functions that require an angle unit
-			 */
-			angle: /^rotate|skew[X|Y]?$/,
-			
-			/**
-			 * @var Regex identifies functions that require a length unit
-			 */
-			length: /^origin|translate[X|Y]?$/,
-			
-			/**
-			 * @var Regex identifies functions that do not require a unit
-			 */
-			scale: /^scale[X|Y]?$/,
-			
-			/**
-			 * @var Regex reflection functions
-			 */
-			reflect: /^reflect(XY|X|Y)?$/
-		}
+		funcs: ['matrix', 'origin', 'reflect', 'reflectX', 'reflectXY', 'reflectY', 'rotate', 'scale', 'scaleX', 'scaleY', 'skew', 'skewX', 'skewY', 'translate', 'translateX', 'translateY']
 	});
 	
 	/**
@@ -225,18 +204,27 @@
 				tempMatrix,
 				args;
 			
-			var elem = this.$elem[0];
-			function normalPixels(val) {
+			var elem = this.$elem[0],
+				_this = this;
+			function normalPixels(val, i) {
+				if (rperc.test(val)) {
+					// this really only applies to translation
+					return parseFloat(val) / 100 * _this['safeOuter' + (i ? 'Height' : 'Width')]();
+				}
 				return toPx(elem, val);
 			}
 			
+			var rtranslate = /translate[X|Y]?/,
+				trans = [];
+				
 			for (var func in funcs) {
+				switch ($.type(funcs[func])) {
+					case 'array': args = funcs[func]; break;
+					case 'string': args = $.map(funcs[func].split(','), $.trim); break;
+					default: args = [funcs[func]];
+				}
+				
 				if ($.matrix[func]) {
-					switch ($.type(funcs[func])) {
-						case 'array': args = funcs[func]; break;
-						case 'string': args = $.map(funcs[func].split(','), $.trim);break;
-						default: args = [funcs[func]];
-					}
 					
 					if ($.cssAngle[func]) {
 						// normalize on degrees
@@ -249,20 +237,23 @@
 						args = $.map(args, stripUnits);
 					}
 					
-					// TODO: translation and origin should be applied last
-					// TODO: should hold translations until the extreme end
 					tempMatrix = $.matrix[func].apply(this, args);
-					matrix = matrix ? matrix.x(tempMatrix) : tempMatrix;
+					if (rtranslate.test(func)) {
+						//defer translation
+						trans.push(tempMatrix);
+					} else {
+						matrix = matrix ? matrix.x(tempMatrix) : tempMatrix;
+					}
 				} else if (func == 'origin') {
-					//TODO: this is a dumb way to handle the origin for a matrix
-					args = $.isArray(funcs[func]) ? funcs[func] : [funcs[func]];
 					this[func].apply(this, args);
 				}
 			}
 			
 			// check that we have a matrix
-			// TODO: This will result in a filter being needlessly set in IE
 			matrix = matrix || $.matrix.identity();
+			
+			// Apply translation
+			$.each(trans, function(i, val) { matrix = matrix.x(val); });
 
 			// pull out the relevant values
 			var a = parseFloat(matrix.e(1,1).toFixed(6)),
@@ -336,17 +327,12 @@
 				case undefined: y = '50%'; //TODO: does this work?
 			}
 			
-			// store percentages directly
-			if (/%/.test(x) && /%/.test(y)) {
-				this.setAttr('origin', [x, y]);
-				return true;
-			}
-			
 			// store mixed values with units, assumed pixels
 			this.setAttr('origin', [
-				/%/.test(x) ? x : parseFloat(x) + 'px',
-				/%/.test(y) ? y : parseFloat(y) + 'px'
+				rperc.test(x) ? x : toPx(this.$elem[0], x) + 'px',
+				rperc.test(y) ? y : toPx(this.$elem[0], y) + 'px'
 			]);
+			//console.log(this.getAttr('origin'));
 			return true;
 		},
 		
@@ -385,11 +371,11 @@
 			// now we need to fix it!
 			var	calc = new $.matrix.calc(matrix, this.safeOuterHeight(), this.safeOuterWidth()),
 				origin = this.getAttr('origin'); // mixed percentages and px
-				
+			
 			// translate a 0, 0 origin to the current origin
 			var offset = calc.originOffset(new $.matrix.V2(
-				/%/.test(origin[0]) ? parseFloat(origin[0])/100*calc.outerWidth : parseFloat(origin[0]),
-				/%/.test(origin[1]) ? parseFloat(origin[1])/100*calc.outerHeight : parseFloat(origin[1])
+				rperc.test(origin[0]) ? parseFloat(origin[0])/100*calc.outerWidth : parseFloat(origin[0]),
+				rperc.test(origin[1]) ? parseFloat(origin[1])/100*calc.outerHeight : parseFloat(origin[1])
 			));
 			
 			// IE glues the top-most and left-most pixels of the transformed object to top/left of the original object
@@ -423,13 +409,13 @@
 	 * @param string func
 	 * @param Mixed value
 	 */
-	var rfxnum = /^([\+\-]=)?([\d+.\-]+)(.*)$/;
 	function toPx(elem, val) {
-		var parts = rfxnum.exec($.trim(val)),
-			prop = 'paddingBottom',
-			orig = $.style( elem, prop );
-			
-		if (parts[3]) {
+		var parts = rfxnum.exec($.trim(val));
+		
+		if (parts[3] && parts[3] !== 'px') {
+			var prop = 'paddingBottom',
+				orig = $.style( elem, prop );
+				
 			$.style( elem, prop, val );
 			val = cur( elem, prop );
 			$.style( elem, prop, orig );
@@ -479,7 +465,7 @@
 		safeOuterLength: function(dim) {
 			var funcName = 'outer' + (dim == 'width' ? 'Width' : 'Height');
 			
-			if ($.browser.msie) {
+			if (!$.support.csstransforms && $.browser.msie) {
 				// make the variables more generic
 				dim = dim == 'width' ? 'width' : 'height';
 				
@@ -615,8 +601,7 @@
 			
 			// pull from a local variable to look it up
 			var transform = this.attr || this.$elem.attr(attr);
-			
-			if (!transform || transform.indexOf(func) > -1) {
+			if (!transform || transform.indexOf(func) == -1) {
 				// we don't have any existing values, save it
 				// we don't have this function yet, save it
 				this.attr = $.trim(transform + ' ' + func + '(' + value + ')');
@@ -627,7 +612,7 @@
 				
 				// regex split
 				rfuncvalue.lastIndex = 0; // reset the regex pointer
-				while ((result = rfuncvalue.exec(transform)) !== null) {
+				while (parts = rfuncvalue.exec(transform)) {
 					if (func == parts[1]) {
 						funcs.push(func + '(' + value + ')');
 					} else {
@@ -867,6 +852,7 @@
 			// calculate a start, end and unit for each new value
 			var start, parts, end, //unit,
 				fx = this,
+				transform = fx.elem.transform;
 				orig = $.style(fx.elem, prop);
 
 			$.each(values, function(i, val) {
@@ -886,14 +872,17 @@
 					start = $.angle.toDegree(start);
 				} else if (!$.cssNumber[fx.prop]) {
 					parts = rfxnum.exec($.trim(start));
-					if (parts[3]) {
-						$.style( fx.elem, prop, start);
-						start = cur(fx.elem, prop);
-						$.style( fx.elem, prop, orig);
+					if (parts[3] && parts[3] !== 'px') {
+						if (parts[3] === '%') {
+							start = parseFloat( parts[2] ) / 100 * transform['safeOuter' + (i ? 'Height' : 'Width')]();
+						} else {
+							$.style( fx.elem, prop, start);
+							start = cur(fx.elem, prop);
+							$.style( fx.elem, prop, orig);
+						}
 					}
-				} else {
-					start = parseFloat(start);
 				}
+				start = parseFloat(start);
 				
 				// parse the value with a regex
 				parts = rfxnum.exec($.trim(val));
@@ -906,6 +895,8 @@
 					if (angle) {
 						end = $.angle.toDegree(end + unit);
 						unit = 'deg';
+					} else if (!$.cssNumber[fx.prop] && unit === '%') {
+						start = (start / transform['safeOuter' + (i ? 'Height' : 'Width')]()) * 100;
 					} else if (!$.cssNumber[fx.prop] && unit !== 'px') {
 						$.style( fx.elem, prop, (end || 1) + unit);
 						start = ((end || 1) / cur(fx.elem, prop)) * start;

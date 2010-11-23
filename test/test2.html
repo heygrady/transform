@@ -235,9 +235,9 @@
 					break;
 				case 5:
 					$elem.transform({"rotate": '13deg'});
-					$anim.animate({"rotate": 13, "reflectXY": false}, {
+					$anim.animate({"rotate": '13deg', "reflectXY": false}, {
 						'complete': function(){
-							$anim.transform({"rotate": 13});
+							$anim.transform({"rotate": '13deg'});
 							next(5);
 						}
 					});
@@ -245,33 +245,33 @@
 					break;
 				case 6:
 					$elem.transform({"rotate": '-13deg'});
-					$anim.animate({"rotate": -13}, {
+					$anim.animate({"rotate": '-13deg'}, {
 						'complete': function(){
-							$anim.transform({"rotate": -13});
+							$anim.transform({"rotate": '-13deg'});
 							next(6);
 						}
 					});
 					$text.text('rotate: -13');
 					break;
 				case 7:
-					$elem.transform({"rotate": 195});
-					$anim.animate({"rotate": 195}, {
+					$elem.transform({"rotate": '195deg'});
+					$anim.animate({"rotate": '195deg'}, {
 						'complete': function(){
-							$anim.transform({"rotate": 195});
+							$anim.transform({"rotate": '195deg'});
 							next(7);
 						}
 					});
-					$text.text('rotate: 195');
+					$text.text('rotate: 195deg');
 					break;
 				case 8:
-					$elem.transform({"rotate": -195});
-					$anim.animate({"rotate": -195}, {
+					$elem.transform({"rotate": '-195deg'});
+					$anim.animate({"rotate": '-195deg'}, {
 						'complete': function(){
-							$anim.transform({"rotate": -195});
+							$anim.transform({"rotate": '-195deg'});
 							next(8);
 						}
 					});
-					$text.text('rotate : -195');
+					$text.text('rotate : -195deg');
 					break;
 				case 9:
 					$elem.transform({"scale": .75});
@@ -314,84 +314,84 @@
 					$text.text('scaleY : .75');
 					break;
 				case 13:
-					$elem.transform({"skew": [13, 0]});
-					$anim.animate({"skew": '13, 0', "scaleY": 1}, {
+					$elem.transform({"skew": ['13deg', 0]});
+					$anim.animate({"skew": '13deg, 0', "scaleY": 1}, {
 						'complete': function(){
-							$anim.transform({"skew": [13, 0]});
+							$anim.transform({"skew": ['13deg', 0]});
 							next(13);
 						}
 					});
-					$text.text('skew : 13');
+					$text.text('skew : 13deg');
 					break;
 				case 14:
-					$elem.transform({"skew": ['13', 13]});
-					$anim.animate({"skew": '13, 13'}, {
+					$elem.transform({"skew": ['13deg', '13deg']});
+					$anim.animate({"skew": '13deg, 13deg'}, {
 						'complete': function(){
-							$anim.transform({"skew": [13, 13]});
+							$anim.transform({"skew": ['13deg', '13deg']});
 							next(14);
 						}
 					});
-					$text.text('skew : [13, 13]');
+					$text.text('skew : [13deg, 13deg]');
 					break;
 				case 15:
-					$elem.transform({"skewX": '13'});
-					$anim.animate({"skewX": '13', "skew": '0, 0'}, {
+					$elem.transform({"skewX": '13deg'});
+					$anim.animate({"skewX": '13deg', "skew": '0, 0'}, {
 						'complete': function(){
-							$anim.transform({"skewX": 13});
+							$anim.transform({"skewX": '13deg'});
 							next(15);
 						}
 					});
-					$text.text('skewX : 13');
+					$text.text('skewX : 13deg');
 					break;
 				case 16:
-					$elem.transform({"skewY": 13});
-					$anim.animate({"skewY": 13, "skewX": 0}, {
+					$elem.transform({"skewY": '13'});
+					$anim.animate({"skewY": '13deg', "skewX": 0}, {
 						'complete': function(){
-							$anim.transform({"skewY": 13});
+							$anim.transform({"skewY": '13deg'});
 							next(16);
 						}
 					});
 					$text.text('skewY : 13');
 					break;
 				case 17:
-					$elem.transform({"translate": [13, 0]});
-					$anim.animate({"translate": '13, 0', "skewY": 0}, {
+					$elem.transform({"translate": ['13px', 0]});
+					$anim.animate({"translate": '13px, 0', "skewY": 0}, {
 						'complete': function(){
-							$anim.transform({"translate": [13, 0]});
+							$anim.transform({"translate": ['13px', 0]});
 							next(17);
 						}
 					});
-					$text.text('translate : 13');
+					$text.text('translate : 13px');
 					break;
 				case 18:
-					$elem.transform({"translate": [13, 13]});
-					$anim.animate({"translate": '13, 13'}, {
+					$elem.transform({"translate": ['13px', '13px']});
+					$anim.animate({"translate": '13px, 13px'}, {
 						'complete': function(){
-							$anim.transform({"translate": [13, 13]});
+							$anim.transform({"translate": ['13px', '13px']});
 							next(18);
 						}
 					});
-					$text.text('translate : [13, 13]');
+					$text.text('translate : [13px, 13px]');
 					break;
 				case 19:
-					$elem.transform({"translateX": 13});
-					$anim.animate({"translateX": 13, "translate": '0, 0'}, {
+					$elem.transform({"translateX": '13px'});
+					$anim.animate({"translateX": '13px', "translate": '0, 0'}, {
 						'complete': function(){
-							$anim.transform({"translateX": 13});
+							$anim.transform({"translateX": '13px'});
 							next(19);
 						}
 					});
-					$text.text('translateX : 13');
+					$text.text('translateX : 13px');
 					break;
 				case 20:
-					$elem.transform({"translateY": 13});
-					$anim.animate({"translateY": 13, "translateX": 0}, {
+					$elem.transform({"translateY": '13px'});
+					$anim.animate({"translateY": '13px', "translateX": 0}, {
 						'complete': function(){
-							$anim.transform({"translateY": 13});
+							$anim.transform({"translateY": '13px'});
 							next(20);
 						}
 					});
-					$text.text('translateY : 13');
+					$text.text('translateY : 13px');
 					break;
 				default:
 					step = 0;

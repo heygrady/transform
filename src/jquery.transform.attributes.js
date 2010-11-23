@@ -42,8 +42,7 @@
 			
 			// pull from a local variable to look it up
 			var transform = this.attr || this.$elem.attr(attr);
-			
-			if (!transform || transform.indexOf(func) > -1) {
+			if (!transform || transform.indexOf(func) == -1) {
 				// we don't have any existing values, save it
 				// we don't have this function yet, save it
 				this.attr = $.trim(transform + ' ' + func + '(' + value + ')');
@@ -54,7 +53,7 @@
 				
 				// regex split
 				rfuncvalue.lastIndex = 0; // reset the regex pointer
-				while ((result = rfuncvalue.exec(transform)) !== null) {
+				while (parts = rfuncvalue.exec(transform)) {
 					if (func == parts[1]) {
 						funcs.push(func + '(' + value + ')');
 					} else {
