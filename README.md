@@ -15,6 +15,7 @@ NOTE: In Internet Explorer 8 and below, the transform-origin and the translate f
 
 ## Usage
 NOTES:
+
 * Since 0.9.0, proper units are required
 * Since 0.9.0, jQuery 1.4.3 or above is required
 
