@@ -3,6 +3,9 @@ This library uses native CSS3 transformations in supported browsers and relies o
 
 NOTE: In Internet Explorer 8 and below, the transform-origin and the translate functions are simulated using relative positioning. Because of this, in Internet Explorer 8 and below, the top and left position of an element will be incorrect after it has been transformed. The [solution](https://github.com/heygrady/transform/issues#issue/6) is to wrap the element that is to be transformed and position that wrapper instead.
 
+* Since 0.9.0, proper units are required
+* Since 0.9.0, jQuery 1.4.3 or above is required
+
 ## Supported Browsers
 * Native CSS3 Support
 	* FireFox 3.5+
@@ -14,9 +17,6 @@ NOTE: In Internet Explorer 8 and below, the transform-origin and the translate f
 	* Internet Explorer 5.5 - 8
 
 ## Usage
-* Since 0.9.0, proper units are required
-* Since 0.9.0, jQuery 1.4.3 or above is required
-
 	// Rotate 30 Degrees
 	$('#example').transform({rotate: '30deg'});
 	
