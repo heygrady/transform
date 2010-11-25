@@ -46,29 +46,8 @@
 <script type="text/javascript">
 
 	var $elem = $('.transform');
-	$elem.animate({scale : 1.5}, "slow").animate({scale : 1}, "slow");
-
 	
-	$('.transform').click(function() {
-		var $elem = $(this);
-		
-		//$elem.animate({reflect: 1});
-		
-		//return;
-		$elem.animate({skew: '30deg'}, {
-			complete: function () {
-				$elem.animate({skew: [[-30, -30]]}, {
-					complete: function () {
-						$elem.animate({skew: '60deg, 60'}, {
-							complete: function() {
-								$elem.animate({skew: [[0]]});
-							}
-						});
-					}
-				});
-			}
-		});
-	});
+	$elem.animate({reflect: true},2000);
 	
 </script>
 </body>

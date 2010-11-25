@@ -179,7 +179,57 @@
 			});
 		}
 	};
-	
+	$.each(['matrix', 'reflect', 'reflectX', 'reflectXY', 'reflectY'], function(i, func) {
+		$.fx.multipleValueStep[func] = function(fx) {
+			var d = fx.decomposed,
+				$m = $.matrix;
+				m = $m.identity();
+			
+			d.now = {};
+			
+			// increment each part of the decomposition and recompose it		
+			$.each(d.start, function(k) {
+				// skip functions that don't change
+				if (d.start[k] === d.end[k]) {
+					return true;
+				}
+				
+				// calculate the current value
+				d.now[k] = parseFloat(d.start[k]) + ((parseFloat(d.end[k]) - parseFloat(d.start[k])) * fx.pos);
+				
+				// skip empty functions
+				switch (k) {
+					case 'scaleX': //no break
+					case 'scaleY':
+						if (d.now[k] === 1) {
+							return true;
+						}
+						break;
+					default:
+						if (d.now[k] === 0) {
+							return true;
+						}
+				}
+				
+				// calculating
+				m = m.x($m[k](d.now[k]));
+			});
+			
+			// save the correct matrix values for now
+			var val;
+			$.each(fx.values, function(i) {
+				switch (i) {
+					case 0: val = m.e(1, 1); break;
+					case 1: val = m.e(1, 2); break;
+					case 2: val = m.e(2, 1); break;
+					case 3: val = m.e(2, 2); break;
+					case 4: val = m.e(3, 1); break;
+					case 5: val = m.e(3, 2); break;
+				}
+				fx.values[i].now = val;
+			});
+		};
+	});
 	/**
 	 * Step for animating tranformations
 	 */
@@ -202,30 +252,38 @@
 		};
 	});
 	
-	// Support Reflection animation
-	$.each(['reflect', 'reflectX', 'reflectXY', 'reflectY'], function(i, func) {
-		var _step = $.fx.step[func];
+	// Support matrix animation
+	$.each(['matrix', 'reflect', 'reflectX', 'reflectXY', 'reflectY'], function(i, func) {
 		$.fx.step[func] = function(fx) {
 			var transform = fx.elem.transform || new $.transform(fx.elem),
 				funcs = {};
 				
 			if (!fx.initialized) {
-				fx.start = 
 				fx.initialized = true;
-				var values = $.matrix[func]().elements;
-				
-				$.each(fx.values, function(i) {
+
+				// Reflections need a sensible end value set
+				if (func !== 'matrix') {
+					var values = $.matrix[func]().elements;
 					var val;
-					switch (i) {
-						case 0: val = values[0]; break;
-						case 1: val = values[2]; break;
-						case 2: val = values[1]; break;
-						case 3: val = values[3]; break;
-						default: val = 0;
-					}
-					fx.values[i].end = val;
-					fx.initialized = true;
-				});
+					$.each(fx.values, function(i) {
+						switch (i) {
+							case 0: val = values[0]; break;
+							case 1: val = values[2]; break;
+							case 2: val = values[1]; break;
+							case 3: val = values[3]; break;
+							default: val = 0;
+						}
+						fx.values[i].end = val;
+					});
+				}
+				
+				// Decompose the start and end
+				fx.decomposed = {};
+				var v = fx.values;
+				fx.decomposed.start = $.matrix.matrix(v[0].start, v[1].start, v[2].start, v[3].start, v[4].start, v[5].start).decompose();
+				fx.decomposed.end = $.matrix.matrix(v[0].end, v[1].end, v[2].end, v[3].end, v[4].end, v[5].end).decompose();
+				
+				console.log(fx.decomposed.start, fx.decomposed.end);
 			}
 			
 			($.fx.multipleValueStep[fx.prop] || $.fx.multipleValueStep._default)(fx);

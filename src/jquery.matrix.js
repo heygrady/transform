@@ -94,6 +94,60 @@
 			}
 			
 			return this.elements[(row - 1) * cols + col - 1];
+		},
+		
+		/**
+		 * Taken from Zoomooz
+	     * https://github.com/jaukia/zoomooz/blob/c7a37b9a65a06ba730bd66391bbd6fe8e55d3a49/js/jquery.zoomooz.js
+		 */
+		decompose: function() {
+			var a = this.e(1, 1),
+				b = this.e(2, 1),
+				c = this.e(1, 2),
+				d = this.e(2, 2),
+				e = this.e(3, 1),
+				f = this.e(3, 2);
+			
+			if (Math.abs(a * d - b * c) < 0.01) {
+				//console.log("fail!");
+				return;
+			}
+			
+			var tx = e, ty = f;
+			
+			var sx = Math.sqrt(a * a + b * b);
+			a = a/sx;
+			b = b/sx;
+			
+			var k = a * c + b * d;
+			c -= a * k;
+			d -= b * k;
+			
+			var sy = Math.sqrt(c * c + d * d);
+			c = c / sy;
+			d = d / sy;
+			k = k / sy;
+			
+			if ((a * d - b * c) < 0.0) {
+				a = -a;
+				b = -b;
+				c = -c;
+				d = -d;
+				sx = -sx;
+				sy = -sy;
+			}
+		
+			var r = $.angle.toDegree(Math.atan2(b, a) + 'rad');
+			k = $.angle.toDegree(Math.atan(k) + 'rad');
+			
+			return {
+				rotate: parseFloat(r.toFixed(8)) + 'deg',
+				skewX: parseFloat(k.toFixed(8)) + 'deg',
+				scaleX: parseFloat(sx.toFixed(8)),
+				scaleY: parseFloat(sy.toFixed(8)),
+				translateX: parseFloat(tx.toFixed(8)) + 'px',
+				translateY: parseFloat(ty.toFixed(8)) + 'px'
+			};
 		}
 	};
 	
