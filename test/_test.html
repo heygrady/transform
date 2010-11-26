@@ -10,7 +10,7 @@
 	background-color: #eeeeee;
 	margin: 25px;	
 }
-.transform {
+.transform, .animate {
 	width: 130px;
 	height: 130px;
 	padding: 10px;
@@ -25,7 +25,7 @@
 <body>
 
 <div class="wrap">
-	<div class="transform">Transform This</div>
+	<div class="animate">Transform This</div>
 </div>
 <div class="wrap">
 	<div class="transform">Transform This</div>
@@ -44,10 +44,22 @@
 <script src="../src/jquery.matrix.functions.js"></script>
 
 <script type="text/javascript">
-
+	var $anim = $('.animate');
 	var $elem = $('.transform');
 	
-	$elem.animate({reflect: true},2000);
+	var t = 'reflectY';
+	var o = {};
+	o[t] = true;
+	var m = $.matrix[t]();
+	var d = m.decompose();
+	
+	console.log('elements', m.elements);
+	console.log('scaleX:', d.scaleX, 'scaleY', d.scaleY);
+	
+	$anim.animate($.extend({}, o), 2000);
+	$elem.first().css($.extend({}, o));
+	$elem.last().css(d);
+	
 	
 </script>
 </body>

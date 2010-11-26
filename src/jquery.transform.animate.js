@@ -188,16 +188,11 @@
 			d.now = {};
 			
 			// increment each part of the decomposition and recompose it		
-			$.each(d.start, function(k) {
-				// skip functions that don't change
-				if (d.start[k] === d.end[k]) {
-					return true;
-				}
-				
+			$.each(d.start, function(k) {				
 				// calculate the current value
 				d.now[k] = parseFloat(d.start[k]) + ((parseFloat(d.end[k]) - parseFloat(d.start[k])) * fx.pos);
 				
-				// skip empty functions
+				// skip functions that won't affect the transform
 				switch (k) {
 					case 'scaleX': //no break
 					case 'scaleY':
@@ -280,10 +275,9 @@
 				// Decompose the start and end
 				fx.decomposed = {};
 				var v = fx.values;
+				
 				fx.decomposed.start = $.matrix.matrix(v[0].start, v[1].start, v[2].start, v[3].start, v[4].start, v[5].start).decompose();
 				fx.decomposed.end = $.matrix.matrix(v[0].end, v[1].end, v[2].end, v[3].end, v[4].end, v[5].end).decompose();
-				
-				console.log(fx.decomposed.start, fx.decomposed.end);
 			}
 			
 			($.fx.multipleValueStep[fx.prop] || $.fx.multipleValueStep._default)(fx);

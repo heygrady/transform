@@ -107,46 +107,60 @@
 				d = this.e(2, 2),
 				e = this.e(3, 1),
 				f = this.e(3, 2);
-			
+				
+			// In case the matrix can't be decomposed
 			if (Math.abs(a * d - b * c) < 0.01) {
-				//console.log("fail!");
-				return;
+				return {
+					rotate: 0 + 'deg',
+					skewX: 0 + 'deg',
+					scaleX: 1,
+					scaleY: 1,
+					translateX: 0 + 'px',
+					translateY: 0 + 'px'
+				};
 			}
 			
+			// Translate is easy
 			var tx = e, ty = f;
 			
+			// factor out the X scale
 			var sx = Math.sqrt(a * a + b * b);
 			a = a/sx;
 			b = b/sx;
 			
+			// factor out the skew
 			var k = a * c + b * d;
 			c -= a * k;
 			d -= b * k;
 			
+			// factor out the Y scale
 			var sy = Math.sqrt(c * c + d * d);
 			c = c / sy;
 			d = d / sy;
 			k = k / sy;
 			
+			// account for negative scale
 			if ((a * d - b * c) < 0.0) {
 				a = -a;
 				b = -b;
-				c = -c;
-				d = -d;
+				//c = -c; // accomplishes nothing to negate it
+				//d = -d; // accomplishes nothing to negate it
 				sx = -sx;
-				sy = -sy;
+				//sy = -sy //Scale Y shouldn't ever be negated
 			}
-		
-			var r = $.angle.toDegree(Math.atan2(b, a) + 'rad');
-			k = $.angle.toDegree(Math.atan(k) + 'rad');
+			
+			// calculate the rotation angle and skew angle
+			var rad2deg = $.angle.radianToDegree;
+			var r = rad2deg(Math.atan2(b, a));
+			k = rad2deg(Math.atan(k));
 			
 			return {
-				rotate: parseFloat(r.toFixed(8)) + 'deg',
-				skewX: parseFloat(k.toFixed(8)) + 'deg',
-				scaleX: parseFloat(sx.toFixed(8)),
-				scaleY: parseFloat(sy.toFixed(8)),
-				translateX: parseFloat(tx.toFixed(8)) + 'px',
-				translateY: parseFloat(ty.toFixed(8)) + 'px'
+				rotate: parseFloat(r.toFixed(6)) + 'deg',
+				skewX: parseFloat(k.toFixed(6)) + 'deg',
+				scaleX: parseFloat(sx.toFixed(6)),
+				scaleY: parseFloat(sy.toFixed(6)),
+				translateX: parseFloat(tx.toFixed(6)) + 'px',
+				translateY: parseFloat(ty.toFixed(6)) + 'px'
 			};
 		}
 	};
