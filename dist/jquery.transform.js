@@ -6,7 +6,7 @@
  * Dual licensed under the MIT or GPL Version 2 licenses.
  * http://jquery.org/license
  * 
- * Date: Thu Nov 25 02:03:21 2010 -0800
+ * Date: Fri Nov 26 14:48:28 2010 -0800
  */
 ///////////////////////////////////////////////////////
 // Transform
@@ -187,7 +187,7 @@
 				// handle origin separately
 				if (func == 'origin') {
 					this[func].apply(this, $.isArray(funcs[func]) ? funcs[func] : [funcs[func]]);
-				} else if ($.inArray(func, $.transform.funcs) != -1) {
+				} else if ($.inArray(func, $.transform.funcs) !== -1) {
 					values.push(this.createTransformFunc(func, funcs[func]));
 				}
 			}
@@ -785,7 +785,7 @@
 			$.each( prop, function( name, val ) {
 				if ($.cssMultipleValues[name]
 					|| $.cssAngle[name]
-					|| (!$.cssNumber[name] && $.inArray(name, $.transform.funcs))) {
+					|| (!$.cssNumber[name] && $.inArray(name, $.transform.funcs) !== -1)) {
 					// force the original values onto the optall
 					optall.original[name] = val.toString();
 					
@@ -816,7 +816,7 @@
 			angle = $.cssAngle[this.prop];
 		
 		//TODO: simply check for the existence of CSS Hooks?
-		if (multiple || (!$.cssNumber[this.prop] && $.inArray(this.prop, $.transform.funcs))) {
+		if (multiple || (!$.cssNumber[this.prop] && $.inArray(this.prop, $.transform.funcs) !== -1)) {
 			this.values = [];
 			
 			if (!multiple) {
@@ -990,7 +990,7 @@
 			var transform = fx.elem.transform || new $.transform(fx.elem),
 				funcs = {};
 			
-			if ($.cssMultipleValues[func] || (!$.cssNumber[func] && $.inArray(func, $.transform.funcs))) {
+			if ($.cssMultipleValues[func] || (!$.cssNumber[func] && $.inArray(func, $.transform.funcs) !== -1)) {
 				($.fx.multipleValueStep[fx.prop] || $.fx.multipleValueStep._default)(fx);
 				funcs[fx.prop] = [];
 				$.each(fx.values, function(i, val) {

@@ -187,7 +187,7 @@
 				// handle origin separately
 				if (func == 'origin') {
 					this[func].apply(this, $.isArray(funcs[func]) ? funcs[func] : [funcs[func]]);
-				} else if ($.inArray(func, $.transform.funcs) != -1) {
+				} else if ($.inArray(func, $.transform.funcs) !== -1) {
 					values.push(this.createTransformFunc(func, funcs[func]));
 				}
 			}

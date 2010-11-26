@@ -28,7 +28,7 @@
 			$.each( prop, function( name, val ) {
 				if ($.cssMultipleValues[name]
 					|| $.cssAngle[name]
-					|| (!$.cssNumber[name] && $.inArray(name, $.transform.funcs))) {
+					|| (!$.cssNumber[name] && $.inArray(name, $.transform.funcs) !== -1)) {
 					// force the original values onto the optall
 					optall.original[name] = val.toString();
 					
@@ -59,7 +59,7 @@
 			angle = $.cssAngle[this.prop];
 		
 		//TODO: simply check for the existence of CSS Hooks?
-		if (multiple || (!$.cssNumber[this.prop] && $.inArray(this.prop, $.transform.funcs))) {
+		if (multiple || (!$.cssNumber[this.prop] && $.inArray(this.prop, $.transform.funcs) !== -1)) {
 			this.values = [];
 			
 			if (!multiple) {
@@ -233,7 +233,7 @@
 			var transform = fx.elem.transform || new $.transform(fx.elem),
 				funcs = {};
 			
-			if ($.cssMultipleValues[func] || (!$.cssNumber[func] && $.inArray(func, $.transform.funcs))) {
+			if ($.cssMultipleValues[func] || (!$.cssNumber[func] && $.inArray(func, $.transform.funcs) !== -1)) {
 				($.fx.multipleValueStep[fx.prop] || $.fx.multipleValueStep._default)(fx);
 				funcs[fx.prop] = [];
 				$.each(fx.values, function(i, val) {
