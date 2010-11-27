@@ -193,33 +193,24 @@
 				d.now[k] = parseFloat(d.start[k]) + ((parseFloat(d.end[k]) - parseFloat(d.start[k])) * fx.pos);
 				
 				// skip functions that won't affect the transform
-				switch (k) {
-					case 'scaleX': //no break
-					case 'scaleY':
-						if (d.now[k] === 1) {
-							return true;
-						}
-						break;
-					default:
-						if (d.now[k] === 0) {
-							return true;
-						}
+				if (((k === 'scaleX' || k === 'scaleY') && d.now[k] === 1) ||
+					((k !== 'scaleX' || k !== 'scaleY') && d.now[k] === 0)) {
+					return true;
 				}
 				
 				// calculating
 				m = m.x($m[k](d.now[k]));
 			});
-			
 			// save the correct matrix values for now
 			var val;
 			$.each(fx.values, function(i) {
 				switch (i) {
-					case 0: val = m.e(1, 1); break;
-					case 1: val = m.e(1, 2); break;
-					case 2: val = m.e(2, 1); break;
-					case 3: val = m.e(2, 2); break;
-					case 4: val = m.e(3, 1); break;
-					case 5: val = m.e(3, 2); break;
+					case 0: val = parseFloat(m.e(1, 1).toFixed(6)); break;
+					case 1: val = parseFloat(m.e(1, 2).toFixed(6)); break;
+					case 2: val = parseFloat(m.e(2, 1).toFixed(6)); break;
+					case 3: val = parseFloat(m.e(2, 2).toFixed(6)); break;
+					case 4: val = parseFloat(m.e(3, 1).toFixed(6)); break;
+					case 5: val = parseFloat(m.e(3, 2).toFixed(6)); break;
 				}
 				fx.values[i].now = val;
 			});

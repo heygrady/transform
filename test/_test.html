@@ -44,19 +44,22 @@
 <script src="../src/jquery.matrix.functions.js"></script>
 
 <script type="text/javascript">
+
 	var $anim = $('.animate');
 	var $elem = $('.transform');
 	
-	$anim.animate({ 
-		width: "200px"
-	}, {duration: 600, complete: function() {$anim.text('Done step 1')}}).animate({ 
-		height: "200px"
-	}, {duration: 600, complete: function() {$anim.text('Done step 2')}}).animate({ 
-		width: "120px",
-		height: "120px"
-	}, {duration: 600, complete: function() {$anim.text('Done step 3')}}).animate({ 
-		marginLeft: "100px"
-	}, {duration: 600, complete: function() {$anim.text('Done step 4')}});
+	var t = 'reflectX';
+	var o = {};
+	o[t] = true;
+	var m = $.matrix[t]();
+	var d = m.decompose();
+	
+	console.log('elements', m.elements);
+	console.log('scaleX:', d.scaleX, 'scaleY', d.scaleY);
+	
+	$anim.animate($.extend({}, o), 2000);
+	$elem.first().css($.extend({}, o));
+	$elem.last().css(d);
 	
 	
 </script>

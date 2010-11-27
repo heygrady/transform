@@ -155,12 +155,12 @@
 			k = rad2deg(Math.atan(k));
 			
 			return {
-				rotate: parseFloat(r.toFixed(6)) + 'deg',
-				skewX: parseFloat(k.toFixed(6)) + 'deg',
-				scaleX: parseFloat(sx.toFixed(6)),
-				scaleY: parseFloat(sy.toFixed(6)),
-				translateX: parseFloat(tx.toFixed(6)) + 'px',
-				translateY: parseFloat(ty.toFixed(6)) + 'px'
+				rotate: r + 'deg',
+				skewX: k + 'deg',
+				scaleX: sx,
+				scaleY: sy,
+				translateX: tx + 'px',
+				translateY: ty + 'px'
 			};
 		}
 	};

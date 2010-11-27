@@ -43,9 +43,10 @@
 <!--[if !IE]><!--> <body>                                 <!--<![endif]-->
 	<div id="container">
 		<div id="header">
-			<button id="go">Click It!</button>
-			<button id="test">Test!</button>
-			<h2>Test</h2>
+			<button id="all">Run All</button>
+			<button id="prev">Prev</button>
+			<button id="next">Next</button>
+			<h2>Test <span id="step"></span><span id="func"></span><span id="data"></span></h2>
 		</div>
 		<div id="body">
 			
@@ -119,16 +120,6 @@
 				</div>
 			</div>
 		</div>
-		<div id="footer">
-				<div class="box plain">
-					<div class="outer">
-						<div class="transform">
-							<p>Some Text</p>
-						</div>
-					</div>
-				</div>
-			
-		</div>
 	</div>
 
 	<!-- JavaScrpt -->
@@ -142,225 +133,264 @@
 	<script src="../src/jquery.matrix.functions.js"></script>
 	
 	<script type="text/javascript">
-		$('#test').click(test);
-		
-		function test() {
-			var $elem = $elem = $('.transform:last');
+		var log = 0;
+		if ($.transform.prototype.exec) {
+			var _exec = $.transform.prototype.exec;
+			$.transform.prototype.exec = function(){
+				log++;
+				return _exec.apply(this, arguments);
+			};
+		} else if ($.transform.prototype.transform) {
+			var _transform = $.transform.prototype.transform;
+			$.transform.prototype.transform = function(){
+				log++;
+				return _transform.apply(this, arguments);
+			};
+		}
 			
-			$elem.transform({matrix: [.75, 0, 0, .75], reflect: false});
+		var $elem = $('.transform, .transition'),
+			$anim = $('.animate'),
+			$text = $('#func'),
+			$step = $('#step'),
+			$data = $('#data'),
+			current = -1;
+		
+		
+		$('#all').click(all);
+		$('#prev').click(prev);
+		$('#next').click(next);
+		
+		function all() {
+			 next(current);
 		}
 		
+		function prev() {
+			current--;
+			$step.text(current + ': ');
+			go();
+		}
+		function next(all) {
+			if (all === current || typeof all === 'object') {
+				current++;
+				$step.text(current + ': ');
+				go(typeof all !== 'object');
+			}
+		}
 		
-		$('#go').click(go);
-		
-		var $elem = $('.transform, .transition');
-		var $anim = $('.animate');
-		var $text = $('h2');
-		var step = 0;
-		function go() {
-			switch (step) {
-				case 0:
+		function go(all) {
+			var now = current;
+			var tests = [
+				function() {
 					$elem.transform({"reflect": true});
 					$anim.animate({"reflect": true}, {
-						'duration': 1000,
 						'complete': function(){
-							//$anim.transform({"reflect": true});
+							if (all) next(now);
 						}
 					});
 					$text.text('reflect');
-					
-					break;
-				case 1:
+				},
+				function() {
 					$elem.transform({"reflectX": true});
 					$anim.animate({"reflectX": true}, {
 						'complete': function(){
-							//$anim.transform({"reflectX": true});
+							if (all) next(now);
 						}
 					});
 					$text.text('reflectX');
-					break;
-				case 2:
+				},
+				function() {
 					$elem.transform({"reflectXY": true});
 					$anim.animate({"reflectXY": true}, {
 						'complete': function(){
-							//$anim.transform({"reflectXY": true});
+							if (all) next(now);
 						}
 					});
 					$text.text('reflectXY');
-					break;
-				case 3:
+				},
+				function() {
 					$elem.transform({"reflectY": true});
 					$anim.animate({"reflectY": true}, {
 						'complete': function(){
-							//$anim.transform({"reflectY": true});
+							if (all) next(now);
 						}
 					});
 					$text.text('reflectY');
-					break;
-				case 4:
+				},
+				function() {
 					$elem.transform({"reflectXY": true});
 					$anim.animate({"reflectXY": true}, {
 						'complete': function(){
-							//$anim.transform({"reflectXY": true});
+							if (all) next(now);
 						}
 					});
 					$text.text('reflectXY');
-					break;
-				case 5:
+				},
+				function() {
 					$elem.transform({"rotate": '13deg'});
-					$anim.animate({"rotate": 13, "reflectXY": false}, {
+					$anim.animate({"rotate": '13deg', "matrix": [1, 0, 0, 1]}, {
 						'complete': function(){
-							$anim.transform({"rotate": 13});
+							if (all) next(now);
 						}
 					});
-					$text.text('rotate: 13');
-					break;
-				case 6:
+					$text.text('rotate: 13deg');
+				},
+				function() {
 					$elem.transform({"rotate": '-13deg'});
-					$anim.animate({"rotate": -13}, {
+					$anim.animate({"rotate": '-13deg'}, {
 						'complete': function(){
-							$anim.transform({"rotate": -13});
+							if (all) next(now);
 						}
 					});
-					$text.text('rotate: -13');
-					break;
-				case 7:
-					$elem.transform({"rotate": 195});
-					$anim.animate({"rotate": 195}, {
+					$text.text('rotate: -13deg');
+				},
+				function() {
+					$elem.transform({"rotate": '195deg'});
+					$anim.animate({"rotate": '195deg'}, {
 						'complete': function(){
-							$anim.transform({"rotate": 195});
+							if (all) next(now);
 						}
 					});
-					$text.text('rotate: 195');
-					break;
-				case 8:
-					$elem.transform({"rotate": -195});
-					$anim.animate({"rotate": -195}, {
+					$text.text('rotate: 195deg');
+				},
+				function() {
+					$elem.transform({"rotate": '-195deg'});
+					$anim.animate({"rotate": '-195deg'}, {
 						'complete': function(){
-							$anim.transform({"rotate": -195});
+							if (all) next(now);
 						}
 					});
-					$text.text('rotate : -195');
-					break;
-				case 9:
+					$text.text('rotate : -195deg');
+				},
+				function() {
 					$elem.transform({"scale": .75});
 					$anim.animate({"scale": .75, "rotate": 0}, {
 						'complete': function(){
-							$anim.transform({"scale": .75});
+							if (all) next(now);
 						}
 					});
 					$text.text('scale : .75');
-					break;
-				case 10:
+				},
+				function() {
 					$elem.transform({"scale": [.75, .75]});
 					$anim.animate({"scale": [.75, .75]}, {
 						'complete': function(){
-							$anim.transform({"scale": [.75, .75]});
+							if (all) next(now);
 						}
 					});
 					$text.text('scale : [.75, .75]');
-					break;
-				case 11:
+				},
+				function() {
 					$elem.transform({"scaleX": .75});
 					$anim.animate({"scaleX": .75, "scale": [1, 1]}, {
 						'complete': function(){
-							$anim.transform({"scaleX": .75});
+							if (all) next(now);
 						}
 					});
 					$text.text('scaleX : .75');
-					break;
-				case 12:
+				},
+				function() {
 					$elem.transform({"scaleY": .75});
 					$anim.animate({"scaleY": .75, "scaleX": 1}, {
 						'complete': function(){
-							$anim.transform({"scaleY": .75});
+							if (all) next(now);
 						}
 					});
 					$text.text('scaleY : .75');
-					break;
-				case 13:
-					$elem.transform({"skew": 13});
-					$anim.animate({"skew": 13, "scaleY": 1}, {
+				},
+				function() {
+					$elem.transform({"skew": '13deg'});
+					$anim.animate({"skew": '13deg', "scaleY": 1}, {
 						'complete': function(){
-							$anim.transform({"skew": 13});
+							if (all) next(now);
 						}
 					});
 					$text.text('skew : 13');
-					break;
-				case 14:
-					$elem.transform({"skew": ['13', 13]});
-					$anim.animate({"skew": ['13', 13]}, {
+				},
+				function() {
+					$elem.transform({"skew": ['13deg', '13deg']});
+					$anim.animate({"skew": ['13deg', '13deg']}, {
 						'complete': function(){
-							$anim.transform({"skew": [13, 13]});
+							if (all) next(now);
 						}
 					});
-					$text.text('skew : [13, 13]');
-					break;
-				case 15:
-					$elem.transform({"skewX": '13'});
-					$anim.animate({"skewX": '13', "skew": 0}, {
+					$text.text('skew : [13deg, 13deg]');
+				},
+				function() {
+					$elem.transform({"skewX": '13deg'});
+					$anim.animate({"skewX": '13deg', "skew": 0}, {
 						'complete': function(){
-							$anim.transform({"skewX": 13});
+							if (all) next(now);
 						}
 					});
-					$text.text('skewX : 13');
-					break;
-				case 16:
-					$elem.transform({"skewY": 13});
-					$anim.animate({"skewY": 13, "skewX": 0}, {
+					$text.text('skewX : 13deg');
+				},
+				function() {
+					$elem.transform({"skewY": '13deg'});
+					$anim.animate({"skewY": '13deg', "skewX": 0}, {
 						'complete': function(){
-							$anim.transform({"skewY": 13});
+							if (all) next(now);
 						}
 					});
-					$text.text('skewY : 13');
-					break;
-				case 17:
-					$elem.transform({"translate": 13});
-					$anim.animate({"translate": 13, "skewY": 0}, {
+					$text.text('skewY : 13deg');
+				},
+				function() {
+					$elem.transform({"translate": '13px'});
+					$anim.animate({"translate": '13px', "skewY": 0}, {
 						'complete': function(){
-							$anim.transform({"translate": 13});
+							if (all) next(now);
 						}
 					});
-					$text.text('translate : 13');
-					break;
-				case 18:
-					$elem.transform({"translate": [13, 13]});
-					$anim.animate({"translate": [13, 13]}, {
+					$text.text('translate : 13px');
+				},
+				function() {
+					$elem.transform({"translate": ['13px', '13px']});
+					$anim.animate({"translate": ['13px', '13px']}, {
 						'complete': function(){
-							$anim.transform({"translate": [13, 13]});
+							if (all) next(now);
 						}
 					});
-					$text.text('translate : [13, 13]');
-					break;
-				case 19:
-					$elem.transform({"translateX": 13});
-					$anim.animate({"translateX": 13, "translate": [0, 0]}, {
+					$text.text('translate : [13px, 13px]');
+				},
+				function() {
+					$elem.transform({"translateX": '13px'});
+					$anim.animate({"translateX": '13px', "translate": [0, 0]}, {
 						'complete': function(){
-							$anim.transform({"translateX": 13});
+							if (all) next(now);
 						}
 					});
-					$text.text('translateX : 13');
-					break;
-				case 20:
-					$elem.transform({"translateY": 13});
-					$anim.animate({"translateY": 13, "translateX": 0}, {
+					$text.text('translateX : 13px');
+				},
+				function () {
+					$elem.transform({"translateY": '13px'});
+					$anim.animate({"translateY": '13px', "translateX": 0}, {
 						'complete': function(){
-							$anim.transform({"translateY": 13});
+							if (all) next(now);
 						}
 					});
-					$text.text('translateY : 13');
-					break;
-				default:
-					step = -1;
+					$text.text('translateY : 13px');
+				},
+				function () {
 					$elem.transform({});
 					$anim.animate({"translateY": 0}, {
 						'complete': function(){
-							$anim.transform({});
+							if (all) next(now);
 						}
 					});
 					$text.text('Test');
+				}
+			];
+			
+			if (tests[current]) {
+				tests[current]();
+				$data.text(' | ' + $elem.first().attr('data-transform'));
+			} else {
+				$text.text('Done! Ran ' + log + ' times.');
+				$data.text('');
+				current = -1;
+				log = 0;
+				return false;
 			}
-			step++;
+			return true;
 		}
 	</script>
 </body>

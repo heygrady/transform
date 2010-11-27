@@ -80,11 +80,11 @@ h2 {
 	-moz-transition-duration: .4s;
 	-moz-transition-timing-function: ease-in-out;
 	
-	-webkit-transition-property: -moz-transform;
+	-webkit-transition-property: -webkit-transform;
 	-webkit-transition-duration: .4s;
 	-webkit-transition-timing-function: ease-in-out;
 	
-	-o-transition-property: -moz-transform;
+	-o-transition-property: -o-transform;
 	-o-transition-duration: .4s;
 	-o-transition-timing-function: ease-in-out;
 }
