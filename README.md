@@ -33,7 +33,7 @@ NOTE: In Internet Explorer 8 and below, the transform-origin and the translate f
 		reflectX: true, //mirrored upside down
 		reflectXY: true, //same as reflectX + rotate(-90deg)
 		reflectY: true, //mirrored
-		rotate: true, //rotates 45 degrees
+		rotate: '45deg', //rotates 45 degrees
 		skew: ['10deg', '10deg'], //skews 10 degrees on the x and y axis
 		skewX: '10deg', //skews 10 degrees on the x axis
 		skewY: '10deg', //skews 10 degrees on the y axis
