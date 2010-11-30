@@ -18,7 +18,11 @@
 	 */
 	var _animate = $.fn.animate;
 	$.fn.animate = function( prop, speed, easing, callback ) {
-		var optall = $.speed(speed, easing, callback);
+		var optall = $.speed(speed, easing, callback),
+			mv = $.cssMultipleValues;
+		
+		// Speed always creates a complete function that must be reset
+		optall.complete = optall.old;
 		
 		// Capture multiple values
 		if (!$.isEmptyObject(prop)) {
@@ -26,10 +30,27 @@
 				optall.original = {};
 			}
 			$.each( prop, function( name, val ) {
-				if ($.cssMultipleValues[name]
+				if (mv[name]
 					|| $.cssAngle[name]
 					|| (!$.cssNumber[name] && $.inArray(name, $.transform.funcs) !== -1)) {
-					// force the original values onto the optall
+					
+					// Handle special easing
+					var specialEasing = null;
+					if (jQuery.isArray(prop[name])) {
+						var mvlen = 1, len = val.length;
+						if (mv[name]) {
+							mvlen = (typeof mv[name].length === 'undefined' ? mv[name] : mv[name].length);
+						}
+						if ( len > mvlen
+							|| (len < mvlen && len == 2)
+							|| (len == 2 && mvlen == 2 && isNaN(parseFloat(val[len - 1])))) {
+							
+							specialEasing = val[len - 1];
+							val.splice(len - 1, 1);
+						}
+					}
+					
+					// Store the original values onto the optall
 					optall.original[name] = val.toString();
 					
 					// reduce to a unitless number

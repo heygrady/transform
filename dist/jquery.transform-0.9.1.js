@@ -1,12 +1,12 @@
 /*!
- * jQuery 2d Transform v0.9.0
+ * jQuery 2d Transform v0.9.1
  * http://wiki.github.com/heygrady/transform/
  *
  * Copyright 2010, Grady Kuhnline
  * Dual licensed under the MIT or GPL Version 2 licenses.
  * http://jquery.org/license
  * 
- * Date: Sun Nov 14 13:45:35 2010 -0800
+ * Date: Fri Nov 26 23:43:06 2010 -0800
  */
 ///////////////////////////////////////////////////////
 // Transform
@@ -187,7 +187,7 @@
 				// handle origin separately
 				if (func == 'origin') {
 					this[func].apply(this, $.isArray(funcs[func]) ? funcs[func] : [funcs[func]]);
-				} else if ($.inArray(func, $.transform.funcs) != -1) {
+				} else if ($.inArray(func, $.transform.funcs) !== -1) {
 					values.push(this.createTransformFunc(func, funcs[func]));
 				}
 			}
@@ -775,7 +775,11 @@
 	 */
 	var _animate = $.fn.animate;
 	$.fn.animate = function( prop, speed, easing, callback ) {
-		var optall = $.speed(speed, easing, callback);
+		var optall = $.speed(speed, easing, callback),
+			mv = $.cssMultipleValues;
+		
+		// Speed always creates a complete function that must be reset
+		optall.complete = optall.old;
 		
 		// Capture multiple values
 		if (!$.isEmptyObject(prop)) {
@@ -783,10 +787,27 @@
 				optall.original = {};
 			}
 			$.each( prop, function( name, val ) {
-				if ($.cssMultipleValues[name]
+				if (mv[name]
 					|| $.cssAngle[name]
-					|| (!$.cssNumber[name] && $.inArray(name, $.transform.funcs))) {
-					// force the original values onto the optall
+					|| (!$.cssNumber[name] && $.inArray(name, $.transform.funcs) !== -1)) {
+					
+					// Handle special easing
+					var specialEasing = null;
+					if (jQuery.isArray(prop[name])) {
+						var mvlen = 1, len = val.length;
+						if (mv[name]) {
+							mvlen = (typeof mv[name].length === 'undefined' ? mv[name] : mv[name].length);
+						}
+						if ( len > mvlen
+							|| (len < mvlen && len == 2)
+							|| (len == 2 && mvlen == 2 && isNaN(parseFloat(val[len - 1])))) {
+							
+							specialEasing = val[len - 1];
+							val.splice(len - 1, 1);
+						}
+					}
+					
+					// Store the original values onto the optall
 					optall.original[name] = val.toString();
 					
 					// reduce to a unitless number
@@ -816,7 +837,7 @@
 			angle = $.cssAngle[this.prop];
 		
 		//TODO: simply check for the existence of CSS Hooks?
-		if (multiple || (!$.cssNumber[this.prop] && $.inArray(this.prop, $.transform.funcs))) {
+		if (multiple || (!$.cssNumber[this.prop] && $.inArray(this.prop, $.transform.funcs) !== -1)) {
 			this.values = [];
 			
 			if (!multiple) {
@@ -936,7 +957,43 @@
 			});
 		}
 	};
-	
+	$.each(['matrix', 'reflect', 'reflectX', 'reflectXY', 'reflectY'], function(i, func) {
+		$.fx.multipleValueStep[func] = function(fx) {
+			var d = fx.decomposed,
+				$m = $.matrix;
+				m = $m.identity();
+			
+			d.now = {};
+			
+			// increment each part of the decomposition and recompose it		
+			$.each(d.start, function(k) {				
+				// calculate the current value
+				d.now[k] = parseFloat(d.start[k]) + ((parseFloat(d.end[k]) - parseFloat(d.start[k])) * fx.pos);
+				
+				// skip functions that won't affect the transform
+				if (((k === 'scaleX' || k === 'scaleY') && d.now[k] === 1) ||
+					((k !== 'scaleX' || k !== 'scaleY') && d.now[k] === 0)) {
+					return true;
+				}
+				
+				// calculating
+				m = m.x($m[k](d.now[k]));
+			});
+			// save the correct matrix values for now
+			var val;
+			$.each(fx.values, function(i) {
+				switch (i) {
+					case 0: val = parseFloat(m.e(1, 1).toFixed(6)); break;
+					case 1: val = parseFloat(m.e(1, 2).toFixed(6)); break;
+					case 2: val = parseFloat(m.e(2, 1).toFixed(6)); break;
+					case 3: val = parseFloat(m.e(2, 2).toFixed(6)); break;
+					case 4: val = parseFloat(m.e(3, 1).toFixed(6)); break;
+					case 5: val = parseFloat(m.e(3, 2).toFixed(6)); break;
+				}
+				fx.values[i].now = val;
+			});
+		};
+	});
 	/**
 	 * Step for animating tranformations
 	 */
@@ -945,7 +1002,7 @@
 			var transform = fx.elem.transform || new $.transform(fx.elem),
 				funcs = {};
 			
-			if ($.cssMultipleValues[func] || (!$.cssNumber[func] && $.inArray(func, $.transform.funcs))) {
+			if ($.cssMultipleValues[func] || (!$.cssNumber[func] && $.inArray(func, $.transform.funcs) !== -1)) {
 				($.fx.multipleValueStep[fx.prop] || $.fx.multipleValueStep._default)(fx);
 				funcs[fx.prop] = [];
 				$.each(fx.values, function(i, val) {
@@ -959,30 +1016,37 @@
 		};
 	});
 	
-	// Support Reflection animation
-	$.each(['reflect', 'reflectX', 'reflectXY', 'reflectY'], function(i, func) {
-		var _step = $.fx.step[func];
+	// Support matrix animation
+	$.each(['matrix', 'reflect', 'reflectX', 'reflectXY', 'reflectY'], function(i, func) {
 		$.fx.step[func] = function(fx) {
 			var transform = fx.elem.transform || new $.transform(fx.elem),
 				funcs = {};
 				
 			if (!fx.initialized) {
-				fx.start = 
 				fx.initialized = true;
-				var values = $.matrix[func]().elements;
-				
-				$.each(fx.values, function(i) {
+
+				// Reflections need a sensible end value set
+				if (func !== 'matrix') {
+					var values = $.matrix[func]().elements;
 					var val;
-					switch (i) {
-						case 0: val = values[0]; break;
-						case 1: val = values[2]; break;
-						case 2: val = values[1]; break;
-						case 3: val = values[3]; break;
-						default: val = 0;
-					}
-					fx.values[i].end = val;
-					fx.initialized = true;
-				});
+					$.each(fx.values, function(i) {
+						switch (i) {
+							case 0: val = values[0]; break;
+							case 1: val = values[2]; break;
+							case 2: val = values[1]; break;
+							case 3: val = values[3]; break;
+							default: val = 0;
+						}
+						fx.values[i].end = val;
+					});
+				}
+				
+				// Decompose the start and end
+				fx.decomposed = {};
+				var v = fx.values;
+				
+				fx.decomposed.start = $.matrix.matrix(v[0].start, v[1].start, v[2].start, v[3].start, v[4].start, v[5].start).decompose();
+				fx.decomposed.end = $.matrix.matrix(v[0].end, v[1].end, v[2].end, v[3].end, v[4].end, v[5].end).decompose();
 			}
 			
 			($.fx.multipleValueStep[fx.prop] || $.fx.multipleValueStep._default)(fx);
@@ -1223,6 +1287,74 @@
 			}
 			
 			return this.elements[(row - 1) * cols + col - 1];
+		},
+		
+		/**
+		 * Taken from Zoomooz
+	     * https://github.com/jaukia/zoomooz/blob/c7a37b9a65a06ba730bd66391bbd6fe8e55d3a49/js/jquery.zoomooz.js
+		 */
+		decompose: function() {
+			var a = this.e(1, 1),
+				b = this.e(2, 1),
+				c = this.e(1, 2),
+				d = this.e(2, 2),
+				e = this.e(3, 1),
+				f = this.e(3, 2);
+				
+			// In case the matrix can't be decomposed
+			if (Math.abs(a * d - b * c) < 0.01) {
+				return {
+					rotate: 0 + 'deg',
+					skewX: 0 + 'deg',
+					scaleX: 1,
+					scaleY: 1,
+					translateX: 0 + 'px',
+					translateY: 0 + 'px'
+				};
+			}
+			
+			// Translate is easy
+			var tx = e, ty = f;
+			
+			// factor out the X scale
+			var sx = Math.sqrt(a * a + b * b);
+			a = a/sx;
+			b = b/sx;
+			
+			// factor out the skew
+			var k = a * c + b * d;
+			c -= a * k;
+			d -= b * k;
+			
+			// factor out the Y scale
+			var sy = Math.sqrt(c * c + d * d);
+			c = c / sy;
+			d = d / sy;
+			k = k / sy;
+			
+			// account for negative scale
+			if ((a * d - b * c) < 0.0) {
+				a = -a;
+				b = -b;
+				//c = -c; // accomplishes nothing to negate it
+				//d = -d; // accomplishes nothing to negate it
+				sx = -sx;
+				//sy = -sy //Scale Y shouldn't ever be negated
+			}
+			
+			// calculate the rotation angle and skew angle
+			var rad2deg = $.angle.radianToDegree;
+			var r = rad2deg(Math.atan2(b, a));
+			k = rad2deg(Math.atan(k));
+			
+			return {
+				rotate: r + 'deg',
+				skewX: k + 'deg',
+				scaleX: sx,
+				scaleY: sy,
+				translateX: tx + 'px',
+				translateY: ty + 'px'
+			};
 		}
 	};
 	

@@ -1,12 +1,12 @@
 /*!
- * jQuery 2d Transform v0.9.1pre
+ * jQuery 2d Transform v0.9.1
  * http://wiki.github.com/heygrady/transform/
  *
  * Copyright 2010, Grady Kuhnline
  * Dual licensed under the MIT or GPL Version 2 licenses.
  * http://jquery.org/license
  * 
- * Date: Fri Nov 26 14:48:28 2010 -0800
+ * Date: Fri Nov 26 23:43:06 2010 -0800
  */
 ///////////////////////////////////////////////////////
 // Transform
@@ -775,7 +775,11 @@
 	 */
 	var _animate = $.fn.animate;
 	$.fn.animate = function( prop, speed, easing, callback ) {
-		var optall = $.speed(speed, easing, callback);
+		var optall = $.speed(speed, easing, callback),
+			mv = $.cssMultipleValues;
+		
+		// Speed always creates a complete function that must be reset
+		optall.complete = optall.old;
 		
 		// Capture multiple values
 		if (!$.isEmptyObject(prop)) {
@@ -783,10 +787,27 @@
 				optall.original = {};
 			}
 			$.each( prop, function( name, val ) {
-				if ($.cssMultipleValues[name]
+				if (mv[name]
 					|| $.cssAngle[name]
 					|| (!$.cssNumber[name] && $.inArray(name, $.transform.funcs) !== -1)) {
-					// force the original values onto the optall
+					
+					// Handle special easing
+					var specialEasing = null;
+					if (jQuery.isArray(prop[name])) {
+						var mvlen = 1, len = val.length;
+						if (mv[name]) {
+							mvlen = (typeof mv[name].length === 'undefined' ? mv[name] : mv[name].length);
+						}
+						if ( len > mvlen
+							|| (len < mvlen && len == 2)
+							|| (len == 2 && mvlen == 2 && isNaN(parseFloat(val[len - 1])))) {
+							
+							specialEasing = val[len - 1];
+							val.splice(len - 1, 1);
+						}
+					}
+					
+					// Store the original values onto the optall
 					optall.original[name] = val.toString();
 					
 					// reduce to a unitless number
@@ -950,33 +971,24 @@
 				d.now[k] = parseFloat(d.start[k]) + ((parseFloat(d.end[k]) - parseFloat(d.start[k])) * fx.pos);
 				
 				// skip functions that won't affect the transform
-				switch (k) {
-					case 'scaleX': //no break
-					case 'scaleY':
-						if (d.now[k] === 1) {
-							return true;
-						}
-						break;
-					default:
-						if (d.now[k] === 0) {
-							return true;
-						}
+				if (((k === 'scaleX' || k === 'scaleY') && d.now[k] === 1) ||
+					((k !== 'scaleX' || k !== 'scaleY') && d.now[k] === 0)) {
+					return true;
 				}
 				
 				// calculating
 				m = m.x($m[k](d.now[k]));
 			});
-			
 			// save the correct matrix values for now
 			var val;
 			$.each(fx.values, function(i) {
 				switch (i) {
-					case 0: val = m.e(1, 1); break;
-					case 1: val = m.e(1, 2); break;
-					case 2: val = m.e(2, 1); break;
-					case 3: val = m.e(2, 2); break;
-					case 4: val = m.e(3, 1); break;
-					case 5: val = m.e(3, 2); break;
+					case 0: val = parseFloat(m.e(1, 1).toFixed(6)); break;
+					case 1: val = parseFloat(m.e(1, 2).toFixed(6)); break;
+					case 2: val = parseFloat(m.e(2, 1).toFixed(6)); break;
+					case 3: val = parseFloat(m.e(2, 2).toFixed(6)); break;
+					case 4: val = parseFloat(m.e(3, 1).toFixed(6)); break;
+					case 5: val = parseFloat(m.e(3, 2).toFixed(6)); break;
 				}
 				fx.values[i].now = val;
 			});
@@ -1336,12 +1348,12 @@
 			k = rad2deg(Math.atan(k));
 			
 			return {
-				rotate: parseFloat(r.toFixed(6)) + 'deg',
-				skewX: parseFloat(k.toFixed(6)) + 'deg',
-				scaleX: parseFloat(sx.toFixed(6)),
-				scaleY: parseFloat(sy.toFixed(6)),
-				translateX: parseFloat(tx.toFixed(6)) + 'px',
-				translateY: parseFloat(ty.toFixed(6)) + 'px'
+				rotate: r + 'deg',
+				skewX: k + 'deg',
+				scaleX: sx,
+				scaleY: sy,
+				translateX: tx + 'px',
+				translateY: ty + 'px'
 			};
 		}
 	};
