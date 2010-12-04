@@ -53,7 +53,7 @@
 					// Store the original values onto the optall
 					optall.original[name] = val.toString();
 					
-					// reduce to a unitless number
+					// reduce to a unitless number (to trick animate)
 					prop[name] = parseFloat(val);
 				}
 			} );
@@ -215,23 +215,24 @@
 				
 				// skip functions that won't affect the transform
 				if (((k === 'scaleX' || k === 'scaleY') && d.now[k] === 1) ||
-					((k !== 'scaleX' || k !== 'scaleY') && d.now[k] === 0)) {
+					(k !== 'scaleX' && k !== 'scaleY' && d.now[k] === 0)) {
 					return true;
 				}
 				
 				// calculating
 				m = m.x($m[k](d.now[k]));
 			});
-			// save the correct matrix values for now
+			
+			// save the correct matrix values for the value of now
 			var val;
 			$.each(fx.values, function(i) {
 				switch (i) {
 					case 0: val = parseFloat(m.e(1, 1).toFixed(6)); break;
-					case 1: val = parseFloat(m.e(1, 2).toFixed(6)); break;
-					case 2: val = parseFloat(m.e(2, 1).toFixed(6)); break;
+					case 1: val = parseFloat(m.e(2, 1).toFixed(6)); break;
+					case 2: val = parseFloat(m.e(1, 2).toFixed(6)); break;
 					case 3: val = parseFloat(m.e(2, 2).toFixed(6)); break;
-					case 4: val = parseFloat(m.e(3, 1).toFixed(6)); break;
-					case 5: val = parseFloat(m.e(3, 2).toFixed(6)); break;
+					case 4: val = parseFloat(m.e(1, 3).toFixed(6)); break;
+					case 5: val = parseFloat(m.e(2, 3).toFixed(6)); break;
 				}
 				fx.values[i].now = val;
 			});

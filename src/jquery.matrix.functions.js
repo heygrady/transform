@@ -12,8 +12,11 @@
 			matrix: {}
 		});
 	}
+	var $m = $.matrix,
+		$m2x2 = $m.M2x2,
+		$m3x3 = $m.M3x3;
 	
-	$.extend( $.matrix, {
+	$.extend( $m, {
 		/**
 		 * Identity matrix
 		 * @param Number size
@@ -27,7 +30,7 @@
 			for (var i = 0; i < length; i++) {
 				elements[i] = (i % mod) === 0 ? 1 : 0;
 			}
-			return new $.matrix['M'+size+'x'+size](elements);
+			return new $m['M'+size+'x'+size](elements);
 		},
 		
 		/**
@@ -39,12 +42,12 @@
 			// arguments are in column-major order
 			switch (arguments.length) {
 				case 4:
-					return new $.matrix.M2x2(
+					return new $m2x2(
 						args[0], args[2],
 						args[1], args[3]
 					);
 				case 6:
-					return new $.matrix.M3x3(
+					return new $m3x3(
 						args[0], args[2], args[4],
 						args[1], args[3], args[5],
 						0,       0,       1
@@ -57,7 +60,7 @@
 		 * @return Matrix
 		 */
 		reflect: function() {
-			return new $.matrix.M2x2(
+			return new $m2x2(
 				-1,  0,
 				 0, -1
 			);
@@ -68,7 +71,7 @@
 		 * @return Matrix
 		 */
 		reflectX: function() {	
-			return new $.matrix.M2x2(
+			return new $m2x2(
 				1,  0,
 				0, -1
 			);
@@ -79,7 +82,7 @@
 		 * @return Matrix
 		 */
 		reflectXY: function() {
-			return new $.matrix.M2x2(
+			return new $m2x2(
 				0, 1,
 				1, 0
 			);
@@ -90,7 +93,7 @@
 		 * @return Matrix
 		 */
 		reflectY: function() {
-			return new $.matrix.M2x2(
+			return new $m2x2(
 				-1, 0,
 				 0, 1
 			);
@@ -113,7 +116,7 @@
 				c = -sintheta,
 				d = costheta;
 				
-			return new $.matrix.M2x2(
+			return new $m2x2(
 				a, c,
 				b, d
 			);
@@ -130,7 +133,7 @@
 			sx = sx || sx === 0 ? sx : 1;
 			sy = sy || sy === 0 ? sy : sx;
 			
-			return new $.matrix.M2x2(
+			return new $m2x2(
 				sx, 0,
 				0, sy
 			);
@@ -142,7 +145,7 @@
 		 * @return Matrix
 		 */
 		scaleX: function (sx) {
-			return $.matrix.scale(sx, 1);
+			return $m.scale(sx, 1);
 		},
 		
 		/**
@@ -151,7 +154,7 @@
 		 * @return Matrix
 		 */
 		scaleY: function (sy) {
-			return $.matrix.scale(1, sy);
+			return $m.scale(1, sy);
 		},
 		
 		/**
@@ -170,7 +173,7 @@
 				x = Math.tan(radX),
 				y = Math.tan(radY);
 			
-			return new $.matrix.M2x2(
+			return new $m2x2(
 				1, x,
 				y, 1
 			);
@@ -183,7 +186,7 @@
 		 * @link http://www.w3.org/TR/SVG/coords.html#SkewXDefined
 		 */
 		skewX: function (degX) {
-			return $.matrix.skew(degX);
+			return $m.skew(degX);
 		},
 		
 		/**
@@ -193,7 +196,7 @@
 		 * @link http://www.w3.org/TR/SVG/coords.html#SkewYDefined
 		 */
 		skewY: function (degY) {
-			return $.matrix.skew(0, degY);
+			return $m.skew(0, degY);
 		},
 		
 		/**
@@ -207,7 +210,7 @@
 			tx = tx || 0;
 			ty = ty || 0;
 			
-			return new $.matrix.M3x3(
+			return new $m3x3(
 				1, 0, tx,
 				0, 1, ty,
 				0, 0, 1
@@ -221,7 +224,7 @@
 		 * @link http://www.w3.org/TR/SVG/coords.html#TranslationDefined
 		 */
 		translateX: function (tx) {
-			return $.matrix.translate(tx);
+			return $m.translate(tx);
 		},
 		
 		/**
@@ -231,7 +234,7 @@
 		 * @link http://www.w3.org/TR/SVG/coords.html#TranslationDefined
 		 */
 		translateY: function (ty) {
-			return $.matrix.translate(0, ty);
+			return $m.translate(0, ty);
 		}
 	});
 })(jQuery, this, this.document);

@@ -12,8 +12,9 @@
 			matrix: {}
 		});
 	}
+	var $m = $.matrix;
 	
-	$.extend( $.matrix, {
+	$.extend( $m, {
 		/**
 		 * A 2-value vector
 		 * @param Number x
@@ -105,8 +106,8 @@
 				b = this.e(2, 1),
 				c = this.e(1, 2),
 				d = this.e(2, 2),
-				e = this.e(3, 1),
-				f = this.e(3, 2);
+				e = this.e(1, 3),
+				f = this.e(2, 3);
 				
 			// In case the matrix can't be decomposed
 			if (Math.abs(a * d - b * c) < 0.01) {
@@ -166,10 +167,10 @@
 	};
 	
 	/** Extend all of the matrix types with the same prototype */
-	$.extend($.matrix.M2x2.prototype, Matrix, {
+	$.extend($m.M2x2.prototype, Matrix, {
 		toM3x3: function() {
 			var a = this.elements;
-			return new $.matrix.M3x3(
+			return new $m.M3x3(
 				a[0], a[1], 0,
 				a[2], a[3], 0,
 				0,    0,    1
@@ -194,13 +195,13 @@
 			
 			if (isVector && b.length == 2) {
 				// b is actually a vector
-				return new $.matrix.V2(
+				return new $m.V2(
 					a[0] * b[0] + a[1] * b[1],
 					a[2] * b[0] + a[3] * b[1]
 				);
 			} else if (b.length == a.length) {
 				// b is a 2x2 matrix
-				return new $.matrix.M2x2(
+				return new $m.M2x2(
 					a[0] * b[0] + a[1] * b[2],
 					a[0] * b[1] + a[1] * b[3],
 					
@@ -220,7 +221,7 @@
 		inverse: function() {
 			var d = 1/this.determinant(),
 				a = this.elements;
-			return new $.matrix.M2x2(
+			return new $m.M2x2(
 				d *  a[3], d * -a[1],
 				d * -a[2], d *  a[0]
 			);
@@ -238,7 +239,7 @@
 		}
 	});
 	
-	$.extend($.matrix.M3x3.prototype, Matrix, {
+	$.extend($m.M3x3.prototype, Matrix, {
 		/**
 		 * Multiply a 3x3 matrix by a similar matrix or a vector
 		 * @param M3x3 | V3 matrix
@@ -257,14 +258,14 @@
 			
 			if (isVector && b.length == 3) {
 				// b is actually a vector
-				return new $.matrix.V3(
+				return new $m.V3(
 					a[0] * b[0] + a[1] * b[1] + a[2] * b[2],
 					a[3] * b[0] + a[4] * b[1] + a[5] * b[2],
 					a[6] * b[0] + a[7] * b[1] + a[8] * b[2]
 				);
 			} else if (b.length == a.length) {
 				// b is a 3x3 matrix
-				return new $.matrix.M3x3(
+				return new $m.M3x3(
 					a[0] * b[0] + a[1] * b[3] + a[2] * b[6],
 					a[0] * b[1] + a[1] * b[4] + a[2] * b[7],
 					a[0] * b[2] + a[1] * b[5] + a[2] * b[8],
@@ -290,7 +291,7 @@
 		inverse: function() {
 			var d = 1/this.determinant(),
 				a = this.elements;
-			return new $.matrix.M3x3(
+			return new $m.M3x3(
 				d * (  a[8] * a[4] - a[7] * a[5]),
 				d * (-(a[8] * a[1] - a[7] * a[2])),
 				d * (  a[5] * a[1] - a[4] * a[2]),
@@ -330,6 +331,6 @@
 	};
 	
 	/** Extend all of the vector types with the same prototype */
-	$.extend($.matrix.V2.prototype, Vector);
-	$.extend($.matrix.V3.prototype, Vector);
+	$.extend($m.V2.prototype, Vector);
+	$.extend($m.V3.prototype, Vector);
 })(jQuery, this, this.document);

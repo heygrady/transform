@@ -136,7 +136,7 @@
 				t.exec(funcs, options);
 			}
 		});
-	};	
+	};
 	
 	$.transform.prototype = {
 		/**
