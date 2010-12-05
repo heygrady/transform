@@ -1,12 +1,12 @@
 /*!
- * jQuery 2d Transform v0.9.2
+ * jQuery 2d Transform v0.9.3
  * http://wiki.github.com/heygrady/transform/
  *
  * Copyright 2010, Grady Kuhnline
  * Dual licensed under the MIT or GPL Version 2 licenses.
  * http://jquery.org/license
  * 
- * Date: Mon Nov 29 22:56:20 2010 -0800
+ * Date: Sat Dec 4 15:46:09 2010 -0800
  */
 ///////////////////////////////////////////////////////
 // Transform
@@ -352,7 +352,7 @@
 			//value = _correctUnits(func, value);
 			
 			if (func == 'matrix') {
-				if (vendorPrefix === '-moz-' && value[4]) {
+				if (vendorPrefix === '-moz-') {
 					value[4] = value[4] ? value[4] + 'px' : 0;
 					value[5] = value[5] ? value[5] + 'px' : 0;
 				}

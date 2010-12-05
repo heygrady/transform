@@ -67,10 +67,10 @@
 	var d = m.decompose();
 	var v = [m.e(1, 1), m.e(2, 1), m.e(1, 2), m.e(2, 2), m.e(1, 3), m.e(2, 3)];
 
-	$anim.eq(0).animate({matrix: [v]}, 1000);
+	$anim.eq(0).animate({matrix: v}, 1000);
 	$anim.eq(1).animate($.extend({}, o), 1000);
 	$anim.eq(2).animate($.extend({}, d), 1000);
-	$elem.eq(0).css({matrix: [v]});
+	$elem.eq(0).css({matrix: v});
 	$elem.eq(1).css($.extend({}, o));
 	$elem.eq(2).css($.extend({}, d));
 

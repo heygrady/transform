@@ -352,7 +352,7 @@
 			//value = _correctUnits(func, value);
 			
 			if (func == 'matrix') {
-				if (vendorPrefix === '-moz-' && value[4]) {
+				if (vendorPrefix === '-moz-') {
 					value[4] = value[4] ? value[4] + 'px' : 0;
 					value[5] = value[5] ? value[5] + 'px' : 0;
 				}
