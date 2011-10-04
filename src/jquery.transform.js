@@ -191,6 +191,12 @@
 					values.push(this.createTransformFunc(func, funcs[func]));
 				}
 			}
+            
+            // fix webkit antializing
+			if (funcs['rotate'] && transformProperty == '-webkit-transform') {
+				values.push('translateZ(1px)'); 
+			}
+            
 			this.$elem.css(transformProperty, values.join(' '));
 			return true;
 		},
