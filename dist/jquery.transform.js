@@ -6,7 +6,7 @@
  * Dual licensed under the MIT or GPL Version 2 licenses.
  * http://jquery.org/license
  * 
- * Date: Sat Dec 4 15:46:09 2010 -0800
+ * Date: Sat Dec 4 16:40:39 2010 -0800
  */
 ///////////////////////////////////////////////////////
 // Transform
@@ -287,8 +287,15 @@
 				this.applyingMatrix = true;
 				this.matrix = matrix;
 				
+				// factor in the object's current rotation so translation remains straight up/down/left/right
+				// otherwise, object will be translated along the rotated axis, which produces undesirable effects
+				var rotation = parseInt(this.$elem.css('rotate')) * -1, // the current rotation in degrees, inverted
+					radians = rotation * (Math.PI / 180), // convert degrees to radians
+					newX = (tx * (Math.cos(radians))) - (ty * (Math.sin(radians))), // calculate new x
+					newY = (tx * (Math.sin(radians))) + (ty * (Math.cos(radians))); // calculate new y
+
 				// IE can't set the origin or translate directly
-				this.fixPosition(matrix, tx, ty);
+				this.fixPosition(matrix, newX, newY);
 				
 				this.applyingMatrix = false;
 				this.matrix = null;
