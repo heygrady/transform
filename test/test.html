@@ -14,7 +14,7 @@
 	<meta name="author" content="">
 
 	<!-- Mobile Viewport Fix
-		@link http://j.mp/mobileviewport & http://davidbcalhoun.com/2010/viewport-metatag 
+		@link http://j.mp/mobileviewport & http://davidbcalhoun.com/2010/viewport-metatag
 	device-width : Occupy full width of the screen in its current orientation
 	initial-scale = 1.0 retains dimensions instead of zooming out if page height > device height
 	maximum-scale = 1.0 retains dimensions instead of zooming in if page width < device width
@@ -28,7 +28,7 @@
 	<!-- CSS : implied media="all"-->
 	<link rel="stylesheet" href="http://yui.yahooapis.com/3.1.1/build/cssreset/reset-min.css" />
 	<link rel="stylesheet" href="css/style.css?v=0.1">
- 
+
 	<!-- All JavaScript at the bottom, except for Modernizr. -->
 	<script src="js/modernizr-1.5.min.js"></script>
 </head>
@@ -49,7 +49,7 @@
 			<h2>Test <span id="step"></span><span id="func"></span><span id="data"></span></h2>
 		</div>
 		<div id="body">
-			
+
 			<div class="clearfix">
 				<div class="box">
 					<div class="outer">
@@ -132,7 +132,7 @@
 	<script src="../src/jquery.matrix.js"></script>
 	<script src="../src/jquery.matrix.calculations.js"></script>
 	<script src="../src/jquery.matrix.functions.js"></script> -->
-	
+
 	<script type="text/javascript">
 		var log = 0;
 		if ($.transform.prototype.exec) {
@@ -148,23 +148,23 @@
 				return _transform.apply(this, arguments);
 			};
 		}
-			
+
 		var $elem = $('.transform, .transition'),
 			$anim = $('.animate'),
 			$text = $('#func'),
 			$step = $('#step'),
 			$data = $('#data'),
 			current = -1;
-		
-		
+
+
 		$('#all').click(all);
 		$('#prev').click(prev);
 		$('#next').click(next);
-		
+
 		function all() {
 			 next(current);
 		}
-		
+
 		function prev() {
 			current--;
 			$step.text(current + ': ');
@@ -177,7 +177,7 @@
 				go(typeof all !== 'object');
 			}
 		}
-		
+
 		function go(all) {
 			var now = current;
 			var tests = [
@@ -380,7 +380,7 @@
 					$text.text('Test');
 				}
 			];
-			
+
 			if (tests[current]) {
 				tests[current]();
 				$data.text(' | ' + $elem.first().attr('data-transform'));

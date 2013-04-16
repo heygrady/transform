@@ -19,13 +19,13 @@ NOTE: In Internet Explorer 8 and below, the transform-origin and the translate f
 ## Usage
 	// Rotate 30 Degrees
 	$('#example').transform({rotate: '30deg'});
-	
+
 	// Use CSS Hooks to Rotate
 	$('#example').css({rotate: '30deg'});
-	
+
 	// Animate the rotation
 	$('#example').animate({rotate: '30deg'});
-	
+
 	// Go Crazy
 	$('#example').transform({
 		matrix: [1, 0, 0, 1, 0, 0], //applies a matrix
@@ -45,14 +45,14 @@ NOTE: In Internet Explorer 8 and below, the transform-origin and the translate f
 		translateY: '20px', //moves the transformation 20px on the y axis
 		origin: ['20%', '20%']  //changes the transformation origin
 	});
-	
+
 	// Properties can be strings or arrays
 	$('#example').css({skew: ['10deg', '10deg']});
 	$('#example').css({skew: '10deg, 10deg'});
-	
+
 	// For animation, arrays should be nested because of jQuery's per-property easing support
 	$('#example').animate({skew: ['10deg', '10deg']}); // technically this defines nonsense easing of 10deg
 	$('#example').animate({skew: [['10deg', '10deg']]}); // this is a friendlier way of supporting this
-	
-	
-	
+
+
+

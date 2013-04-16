@@ -26,7 +26,7 @@ rhino      = "java -jar \"#{build_dir}/js.jar\""
 minfier    = "java -jar \"#{build_dir}/yuicompressor-2.4.2.jar\""
 
 # Turn off output other than needed from `sh` and file commands
-verbose(false) 
+verbose(false)
 
 # Tasks
 task :default => "all"
@@ -43,12 +43,12 @@ desc "Builds a minified version of jQuery Transform: jquery.transform.min.js"
 task :min => jq_min
 
 
-task :init => [] do 
+task :init => [] do
 end
 
 desc "Removes dist folder"
 task :dist do
-  puts "Removing Distribution directory: #{dist_dir}..." 
+  puts "Removing Distribution directory: #{dist_dir}..."
   rm_rf dist_dir
 end
 
@@ -64,7 +64,7 @@ directory dist_dir
 
 file jq => [dist_dir, base_files].flatten do
   puts "Building jquery.transform.js..."
-  
+
   File.open(jq, 'w') do |f|
     f.write cat(base_files).gsub(/(Date:.)/, "\\1#{date}" ).gsub(/@VERSION/, version)
   end

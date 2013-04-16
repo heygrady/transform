@@ -9,16 +9,16 @@
 	width: 150px;
 	height: 150px;
 	background-color: #eeeeee;
-	margin: 25px;	
+	margin: 25px;
 }
 .transform, .animate {
 	width: 130px;
 	height: 130px;
 	padding: 10px;
-	background-color: deeppink;	
+	background-color: deeppink;
 }
 .ie {
-	
+
 }
 </style>
 </head>
@@ -59,10 +59,10 @@
 	var $anim = $('.animate');
 	var $elem = $('.transform');
 	var o = {};
-	
+
 	var t = 'translateY';
 	o[t]  = '10px';
-	
+
 	var m = $.matrix[t](parseFloat(o[t]));
 	var d = m.decompose();
 	var v = [m.e(1, 1), m.e(2, 1), m.e(1, 2), m.e(2, 2), m.e(1, 3), m.e(2, 3)];
@@ -74,7 +74,7 @@
 	$elem.eq(1).css($.extend({}, o));
 	$elem.eq(2).css($.extend({}, d));
 
-	
+
 </script>
 </body>
 </html>

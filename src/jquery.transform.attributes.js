@@ -7,8 +7,8 @@
 		attr = 'data-transform',
 		rspace = /\s/,
 		rcspace = /,\s?/;
-	
-	$.extend($.transform.prototype, {		
+
+	$.extend($.transform.prototype, {
 		/**
 		 * This overrides all of the attributes
 		 * @param Object funcs a list of transform functions to store on this element
@@ -22,12 +22,12 @@
 				if ($.isArray(value)) {
 					value = value.join(', ');
 				}
-				string += ' ' + func + '(' + value + ')'; 
+				string += ' ' + func + '(' + value + ')';
 			}
 			this.attr = $.trim(string);
 			this.$elem.attr(attr, this.attr);
 		},
-		
+
 		/**
 		 * This sets only a specific atribute
 		 * @param string func name of a transform function
@@ -39,7 +39,7 @@
 			if ($.isArray(value)) {
 				value = value.join(', ');
 			}
-			
+
 			// pull from a local variable to look it up
 			var transform = this.attr || this.$elem.attr(attr);
 			if (!transform || transform.indexOf(func) == -1) {
@@ -50,7 +50,7 @@
 			} else {
 				// replace the existing value
 				var funcs = [],	parts;
-				
+
 				// regex split
 				rfuncvalue.lastIndex = 0; // reset the regex pointer
 				while (parts = rfuncvalue.exec(transform)) {
@@ -64,7 +64,7 @@
 				this.$elem.attr(attr, this.attr);
 			}
 		},
-		
+
 		/**
 		 * @return Object
 		 */
@@ -74,10 +74,10 @@
 				// We don't have any existing values, return empty object
 				return {};
 			}
-			
+
 			// replace the existing value
 			var attrs = {}, parts, value;
-			
+
 			rfuncvalue.lastIndex = 0; // reset the regex pointer
 			while ((parts = rfuncvalue.exec(transform)) !== null) {
 				if (parts) {
@@ -87,9 +87,9 @@
 			}
 			return attrs;
 		},
-		
+
 		/**
-		 * @param String func 
+		 * @param String func
 		 * @return mixed
 		 */
 		getAttr: function(func) {
@@ -97,7 +97,7 @@
 			if (typeof attrs[func] !== 'undefined') {
 				return attrs[func];
 			}
-			
+
 			//TODO: move the origin to a function
 			if (func === 'origin' && $.support.csstransforms) {
 				// supported browsers return percentages always
@@ -106,12 +106,12 @@
 				// just force IE to also return a percentage
 				return ['50%', '50%'];
 			}
-			
+
 			return $.cssDefault[func] || 0;
 		}
 	});
-	
-	// Define 
+
+	// Define
 	if (typeof($.cssAngle) == 'undefined') {
 		$.cssAngle = {};
 	}
@@ -121,12 +121,12 @@
 		skewX: true,
 		skewY: true
 	});
-	
+
 	// Define default values
 	if (typeof($.cssDefault) == 'undefined') {
 		$.cssDefault = {};
 	}
-	
+
 	$.extend($.cssDefault, {
 		scale: [1, 1],
 		scaleX: 1,
@@ -138,7 +138,7 @@
 		reflectXY: [1, 0, 0, 1, 0, 0],
 		reflectY: [1, 0, 0, 1, 0, 0]
 	});
-	
+
 	// Define functons with multiple values
 	if (typeof($.cssMultipleValues) == 'undefined') {
 		$.cssMultipleValues = {};
@@ -160,7 +160,7 @@
 		skew: 2,
 		translate: 2
 	});
-	
+
 	// specify unitless funcs
 	$.extend($.cssNumber, {
 		matrix: true,
@@ -172,7 +172,7 @@
 		scaleX: true,
 		scaleY: true
 	});
-	
+
 	// override all of the css functions
 	$.each($.transform.funcs, function(i, func) {
 		$.cssHooks[func] = {
@@ -188,7 +188,7 @@
 			}
 		};
 	});
-	
+
 	// Support Reflection animation better by returning a matrix
 	$.each(['reflect', 'reflectX', 'reflectXY', 'reflectY'], function(i, func) {
 		$.cssHooks[func].get = function(elem, computed) {

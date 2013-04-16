@@ -58,14 +58,14 @@ h2 {
 	border: 5px solid #000000;
 	background-color: deeppink;
 	padding: 5px;
-	
+
 	height: 150px;
 	width: 150px;
-	
+
 	box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	-webkit-box-sizing: border-box;
-	
+
 	-moz-transform: translate(13px, 13px) translateX(13px);
 }
 .plain .transform2 {
@@ -79,11 +79,11 @@ h2 {
 	-moz-transition-property: -moz-transform;
 	-moz-transition-duration: .4s;
 	-moz-transition-timing-function: ease-in-out;
-	
+
 	-webkit-transition-property: -webkit-transform;
 	-webkit-transition-duration: .4s;
 	-webkit-transition-timing-function: ease-in-out;
-	
+
 	-o-transition-property: -o-transform;
 	-o-transition-duration: .4s;
 	-o-transition-timing-function: ease-in-out;
