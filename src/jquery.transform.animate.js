@@ -7,7 +7,7 @@
 	 * @var Regex looks for units on a string
 	 */
 	var rfxnum = /^([+\-]=)?([\d+.\-]+)(.*)$/;
-	
+
 	/**
 	 * Doctors prop values in the event that they contain spaces
 	 * @param Object prop
@@ -20,10 +20,10 @@
 	$.fn.animate = function( prop, speed, easing, callback ) {
 		var optall = $.speed(speed, easing, callback),
 			mv = $.cssMultipleValues;
-		
+
 		// Speed always creates a complete function that must be reset
 		optall.complete = optall.old;
-		
+
 		// Capture multiple values
 		if (!$.isEmptyObject(prop)) {
 			if (typeof optall.original === 'undefined') {
@@ -33,7 +33,7 @@
 				if (mv[name]
 					|| $.cssAngle[name]
 					|| (!$.cssNumber[name] && $.inArray(name, $.transform.funcs) !== -1)) {
-					
+
 					// Handle special easing
 					var specialEasing = null;
 					if (jQuery.isArray(prop[name])) {
@@ -44,26 +44,26 @@
 						if ( len > mvlen
 							|| (len < mvlen && len == 2)
 							|| (len == 2 && mvlen == 2 && isNaN(parseFloat(val[len - 1])))) {
-							
+
 							specialEasing = val[len - 1];
 							val.splice(len - 1, 1);
 						}
 					}
-					
+
 					// Store the original values onto the optall
 					optall.original[name] = val.toString();
-					
+
 					// reduce to a unitless number (to trick animate)
 					prop[name] = parseFloat(val);
 				}
 			} );
 		}
-		
+
 		//NOTE: we edited prop above to trick animate
 		//NOTE: we pre-convert to an optall so we can doctor it
 		return _animate.apply(this, [arguments[0], optall]);
 	};
-	
+
 	var prop = 'paddingBottom';
 	function cur(elem, prop) {
 		if ( elem[prop] != null && (!elem.style || elem.style[prop] == null) ) {
@@ -73,30 +73,30 @@
 		var r = parseFloat( $.css( elem, prop ) );
 		return r && r > -10000 ? r : 0;
 	}
-	
+
 	var _custom = $.fx.prototype.custom;
 	$.fx.prototype.custom = function(from, to, unit) {
 		var multiple = $.cssMultipleValues[this.prop],
 			angle = $.cssAngle[this.prop];
-		
+
 		//TODO: simply check for the existence of CSS Hooks?
 		if (multiple || (!$.cssNumber[this.prop] && $.inArray(this.prop, $.transform.funcs) !== -1)) {
 			this.values = [];
-			
+
 			if (!multiple) {
 				multiple = 1;
 			}
-			
+
 			// Pull out the known values
 			var values = this.options.original[this.prop],
 				currentValues = $(this.elem).css(this.prop),
 				defaultValues = $.cssDefault[this.prop] || 0;
-			
+
 			// make sure the current css value is an array
 			if (!$.isArray(currentValues)) {
 				currentValues = [currentValues];
 			}
-			
+
 			// make sure the new values are an array
 			if (!$.isArray(values)) {
 				if ($.type(values) === 'string') {
@@ -105,14 +105,14 @@
 					values = [values];
 				}
 			}
-			
+
 			// make sure we have enough new values
 			var length = multiple.length || multiple, i = 0;
 			while (values.length < length) {
 				values.push(multiple.duplicate ? values[0] : defaultValues[i] || 0);
 				i++;
 			}
-			
+
 			// calculate a start, end and unit for each new value
 			var start, parts, end, //unit,
 				fx = this,
@@ -130,7 +130,7 @@
 				} else {
 					start = 0;
 				}
-				
+
 				// Force the correct unit on the start
 				if (angle) {
 					start = $.angle.toDegree(start);
@@ -147,15 +147,15 @@
 					}
 				}
 				start = parseFloat(start);
-				
+
 				// parse the value with a regex
 				parts = rfxnum.exec($.trim(val));
-				
+
 				if (parts) {
 					// we found a sensible value and unit
 					end = parseFloat( parts[2] );
 					unit = parts[3] || "px"; //TODO: change to an appropriate default unit
-					
+
 					if (angle) {
 						end = $.angle.toDegree(end + unit);
 						unit = 'deg';
@@ -166,7 +166,7 @@
 						start = ((end || 1) / cur(fx.elem, prop)) * start;
 						$.style( fx.elem, prop, orig);
 					}
-					
+
 					// If a +=/-= token was provided, we're doing a relative animation
 					if (parts[1]) {
 						end = ((parts[1] === "-=" ? -1 : 1) * end) + start;
@@ -174,20 +174,20 @@
 				} else {
 					// I don't know when this would happen
 					end = val;
-					unit = ''; 
+					unit = '';
 				}
-								
+
 				// Save the values
 				fx.values.push({
 					start: start,
 					end: end,
 					unit: unit
-				});				
+				});
 			});
 		}
 		return _custom.apply(this, arguments);
 	};
-	
+
 	/**
 	 * Animates a multi value attribute
 	 * @param Object fx
@@ -205,24 +205,24 @@
 			var d = fx.decomposed,
 				$m = $.matrix;
 				m = $m.identity();
-			
+
 			d.now = {};
-			
-			// increment each part of the decomposition and recompose it		
-			$.each(d.start, function(k) {				
+
+			// increment each part of the decomposition and recompose it
+			$.each(d.start, function(k) {
 				// calculate the current value
 				d.now[k] = parseFloat(d.start[k]) + ((parseFloat(d.end[k]) - parseFloat(d.start[k])) * fx.pos);
-				
+
 				// skip functions that won't affect the transform
 				if (((k === 'scaleX' || k === 'scaleY') && d.now[k] === 1) ||
 					(k !== 'scaleX' && k !== 'scaleY' && d.now[k] === 0)) {
 					return true;
 				}
-				
+
 				// calculating
 				m = m.x($m[k](d.now[k]));
 			});
-			
+
 			// save the correct matrix values for the value of now
 			var val;
 			$.each(fx.values, function(i) {
@@ -245,7 +245,7 @@
 		$.fx.step[func] = function(fx) {
 			var transform = fx.elem.transform || new $.transform(fx.elem),
 				funcs = {};
-			
+
 			if ($.cssMultipleValues[func] || (!$.cssNumber[func] && $.inArray(func, $.transform.funcs) !== -1)) {
 				($.fx.multipleValueStep[fx.prop] || $.fx.multipleValueStep._default)(fx);
 				funcs[fx.prop] = [];
@@ -255,17 +255,17 @@
 			} else {
 				funcs[fx.prop] = fx.now + ($.cssNumber[fx.prop] ? '' : fx.unit);
 			}
-			
+
 			transform.exec(funcs, {preserve: true});
 		};
 	});
-	
+
 	// Support matrix animation
 	$.each(['matrix', 'reflect', 'reflectX', 'reflectXY', 'reflectY'], function(i, func) {
 		$.fx.step[func] = function(fx) {
 			var transform = fx.elem.transform || new $.transform(fx.elem),
 				funcs = {};
-				
+
 			if (!fx.initialized) {
 				fx.initialized = true;
 
@@ -284,21 +284,21 @@
 						fx.values[i].end = val;
 					});
 				}
-				
+
 				// Decompose the start and end
 				fx.decomposed = {};
 				var v = fx.values;
-				
+
 				fx.decomposed.start = $.matrix.matrix(v[0].start, v[1].start, v[2].start, v[3].start, v[4].start, v[5].start).decompose();
 				fx.decomposed.end = $.matrix.matrix(v[0].end, v[1].end, v[2].end, v[3].end, v[4].end, v[5].end).decompose();
 			}
-			
+
 			($.fx.multipleValueStep[fx.prop] || $.fx.multipleValueStep._default)(fx);
 			funcs.matrix = [];
 			$.each(fx.values, function(i, val) {
 				funcs.matrix.push(val.now);
 			});
-			
+
 			transform.exec(funcs, {preserve: true});
 		};
 	});

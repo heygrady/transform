@@ -5,8 +5,8 @@
  * Copyright 2010, Grady Kuhnline
  * Dual licensed under the MIT or GPL Version 2 licenses.
  * http://jquery.org/license
- * 
- * Date: 
+ *
+ * Date:
  */
 ///////////////////////////////////////////////////////
 // Transform
@@ -18,18 +18,18 @@
 	var rmatrix = /progid:DXImageTransform\.Microsoft\.Matrix\(.*?\)/,
 		rfxnum = /^([\+\-]=)?([\d+.\-]+)(.*)$/,
 		rperc = /%/;
-	
+
 	// Steal some code from Modernizr
 	var m = document.createElement( 'modernizr' ),
 		m_style = m.style;
-		
+
 	function stripUnits(arg) {
 		return parseFloat(arg);
 	}
-	
+
 	/**
 	 * Find the prefix that this browser uses
-	 */	
+	 */
 	function getVendorPrefix() {
 		var property = {
 			transformProperty : '',
@@ -45,12 +45,12 @@
 		}
 		return null;
 	}
-	
+
 	function supportCssTransforms() {
 		if (typeof(window.Modernizr) !== 'undefined') {
 			return Modernizr.csstransforms;
 		}
-		
+
 		var props = [ 'transformProperty', 'WebkitTransform', 'MozTransform', 'OTransform', 'msTransform' ];
 		for ( var i in props ) {
 			if ( m_style[ props[i] ] !== undefined  ) {
@@ -58,21 +58,21 @@
 			}
 		}
 	}
-		
+
 	// Capture some basic properties
 	var vendorPrefix			= getVendorPrefix(),
 		transformProperty		= vendorPrefix !== null ? vendorPrefix + 'transform' : false,
 		transformOriginProperty	= vendorPrefix !== null ? vendorPrefix + 'transform-origin' : false;
-	
+
 	// store support in the jQuery Support object
 	$.support.csstransforms = supportCssTransforms();
-	
+
 	// IE9 public preview 6 requires the DOM names
 	if (vendorPrefix == '-ms-') {
 		transformProperty = 'msTransform';
 		transformOriginProperty = 'msTransformOrigin';
 	}
-	
+
 	/**
 	 * Class for creating cross-browser transformations
 	 * @constructor
@@ -81,19 +81,19 @@
 		transform: function(elem) {
 			// Cache the transform object on the element itself
 			elem.transform = this;
-			
+
 			/**
 			 * The element we're working with
 			 * @var jQueryCollection
 			 */
 			this.$elem = $(elem);
-						
+
 			/**
 			 * Remember the matrix we're applying to help the safeOuterLength func
 			 */
 			this.applyingMatrix = false;
 			this.matrix = null;
-			
+
 			/**
 			 * Remember the css height and width to save time
 			 * This is only really used in IE
@@ -103,27 +103,27 @@
 			this.width = null;
 			this.outerHeight = null;
 			this.outerWidth = null;
-			
+
 			/**
 			 * We need to know the box-sizing in IE for building the outerHeight and outerWidth
 			 * @var string
 			 */
 			this.boxSizingValue = null;
 			this.boxSizingProperty = null;
-			
+
 			this.attr = null;
 			this.transformProperty = transformProperty;
 			this.transformOriginProperty = transformOriginProperty;
 		}
 	});
-	
+
 	$.extend($.transform, {
 		/**
 		 * @var Array list of all valid transform functions
 		 */
 		funcs: ['matrix', 'origin', 'reflect', 'reflectX', 'reflectXY', 'reflectY', 'rotate', 'scale', 'scaleX', 'scaleY', 'skew', 'skewX', 'skewY', 'translate', 'translateX', 'translateY']
 	});
-	
+
 	/**
 	 * Create Transform as a jQuery plugin
 	 * @param Object funcs
@@ -137,7 +137,7 @@
 			}
 		});
 	};
-	
+
 	$.transform.prototype = {
 		/**
 		 * Applies all of the transformations
@@ -152,7 +152,7 @@
 				forceMatrix: false,
 				preserve: false
 			}, options);
-	
+
 			// preserve the funcs from the previous run
 			this.attr = null;
 			if (options.preserve) {
@@ -160,10 +160,10 @@
 			} else {
 				funcs = $.extend(true, {}, funcs); // copy the object to prevent weirdness
 			}
-			
+
 			// Record the custom attributes on the element itself
 			this.setAttrs(funcs);
-			
+
 			// apply the funcs
 			if ($.support.csstransforms && !options.forceMatrix) {
 				// CSS3 is supported
@@ -174,14 +174,14 @@
 			}
 			return false;
 		},
-		
+
 		/**
 		 * Applies all of the transformations as functions
 		 * @param Object funcs
 		 */
 		execFuncs: function(funcs) {
 			var values = [];
-			
+
 			// construct a CSS string
 			for (var func in funcs) {
 				// handle origin separately
@@ -194,7 +194,7 @@
 			this.$elem.css(transformProperty, values.join(' '));
 			return true;
 		},
-		
+
 		/**
 		 * Applies all of the transformations as a matrix
 		 * @param Object funcs
@@ -203,7 +203,7 @@
 			var matrix,
 				tempMatrix,
 				args;
-			
+
 			var elem = this.$elem[0],
 				_this = this;
 			function normalPixels(val, i) {
@@ -213,22 +213,22 @@
 				}
 				return toPx(elem, val);
 			}
-			
+
 			var rtranslate = /translate[X|Y]?/,
 				trans = [];
-				
+
 			for (var func in funcs) {
 				switch ($.type(funcs[func])) {
 					case 'array': args = funcs[func]; break;
 					case 'string': args = $.map(funcs[func].split(','), $.trim); break;
 					default: args = [funcs[func]];
 				}
-				
+
 				if ($.matrix[func]) {
-					
+
 					if ($.cssAngle[func]) {
 						// normalize on degrees
-						args = $.map(args, $.angle.toDegree);						
+						args = $.map(args, $.angle.toDegree);
 					} else if (!$.cssNumber[func]) {
 						// normalize to pixels
 						args = $.map(args, normalPixels);
@@ -236,7 +236,7 @@
 						// strip units
 						args = $.map(args, stripUnits);
 					}
-					
+
 					tempMatrix = $.matrix[func].apply(this, args);
 					if (rtranslate.test(func)) {
 						//defer translation
@@ -248,10 +248,10 @@
 					this[func].apply(this, args);
 				}
 			}
-			
+
 			// check that we have a matrix
 			matrix = matrix || $.matrix.identity();
-			
+
 			// Apply translation
 			$.each(trans, function(i, val) { matrix = matrix.x(val); });
 
@@ -262,7 +262,7 @@
 				d = parseFloat(matrix.e(2,2).toFixed(6)),
 				tx = matrix.rows === 3 ? parseFloat(matrix.e(1,3).toFixed(6)) : 0,
 				ty = matrix.rows === 3 ? parseFloat(matrix.e(2,3).toFixed(6)) : 0;
-			
+
 			//apply the transform to the element
 			if ($.support.csstransforms && vendorPrefix === '-moz-') {
 				// -moz-
@@ -273,7 +273,7 @@
 				this.$elem.css(transformProperty, 'matrix(' + a + ', ' + b + ', ' + c + ', ' + d + ', ' + tx + ', ' + ty + ')');
 			} else if ($.browser.msie) {
 				// IE requires the special transform Filter
-				
+
 				//TODO: Use Nearest Neighbor during animation FilterType=\'nearest neighbor\'
 				var filterType = ', FilterType=\'nearest neighbor\''; //bilinear
 				var style = this.$elem[0].style;
@@ -282,20 +282,20 @@
 						', sizingMethod=\'auto expand\'' + filterType + ')';
 				var filter = style.filter || $.curCSS( this.$elem[0], "filter" ) || "";
 				style.filter = rmatrix.test(filter) ? filter.replace(rmatrix, matrixFilter) : filter ? filter + ' ' + matrixFilter : matrixFilter;
-				
+
 				// Let's know that we're applying post matrix fixes and the height/width will be static for a bit
 				this.applyingMatrix = true;
 				this.matrix = matrix;
-				
+
 				// IE can't set the origin or translate directly
 				this.fixPosition(matrix, tx, ty);
-				
+
 				this.applyingMatrix = false;
 				this.matrix = null;
 			}
 			return true;
 		},
-		
+
 		/**
 		 * Sets the transform-origin
 		 * This really needs to be percentages
@@ -312,7 +312,7 @@
 				}
 				return true;
 			}
-			
+
 			// correct for keyword lengths
 			switch (x) {
 				case 'left': x = '0'; break;
@@ -326,7 +326,7 @@
 				case 'center': // no break
 				case undefined: y = '50%'; //TODO: does this work?
 			}
-			
+
 			// store mixed values with units, assumed pixels
 			this.setAttr('origin', [
 				rperc.test(x) ? x : toPx(this.$elem[0], x) + 'px',
@@ -335,7 +335,7 @@
 			//console.log(this.getAttr('origin'));
 			return true;
 		},
-		
+
 		/**
 		 * Create a function suitable for a CSS value
 		 * @param string func
@@ -343,14 +343,14 @@
 		 */
 		createTransformFunc: function(func, value) {
 			if (func.substr(0, 7) === 'reflect') {
-				// let's fake reflection, false value 
+				// let's fake reflection, false value
 				// falsey sets an identity matrix
 				var m = value ? $.matrix[func]() : $.matrix.identity();
 				return 'matrix(' + m.e(1,1) + ', ' + m.e(2,1) + ', ' + m.e(1,2) + ', ' + m.e(2,2) + ', 0, 0)';
 			}
-			
+
 			//value = _correctUnits(func, value);
-			
+
 			if (func == 'matrix') {
 				if (vendorPrefix === '-moz-') {
 					value[4] = value[4] ? value[4] + 'px' : 0;
@@ -359,7 +359,7 @@
 			}
 			return func + '(' + ($.isArray(value) ? value.join(', ') : value) + ')';
 		},
-		
+
 		/**
 		 * @param Matrix matrix
 		 * @param Number tx
@@ -371,13 +371,13 @@
 			// now we need to fix it!
 			var	calc = new $.matrix.calc(matrix, this.safeOuterHeight(), this.safeOuterWidth()),
 				origin = this.getAttr('origin'); // mixed percentages and px
-			
+
 			// translate a 0, 0 origin to the current origin
 			var offset = calc.originOffset(new $.matrix.V2(
 				rperc.test(origin[0]) ? parseFloat(origin[0])/100*calc.outerWidth : parseFloat(origin[0]),
 				rperc.test(origin[1]) ? parseFloat(origin[1])/100*calc.outerHeight : parseFloat(origin[1])
 			));
-			
+
 			// IE glues the top-most and left-most pixels of the transformed object to top/left of the original object
 			//TODO: This seems wrong in the calculations
 			var sides = calc.sides();
@@ -387,11 +387,11 @@
 			if (cssPosition == 'static') {
 				cssPosition = 'relative';
 			}
-			
+
 			//TODO: if the element is already positioned, we should attempt to respect it (somehow)
 			//NOTE: we could preserve our offset top and left in an attr on the elem
 			var pos = {top: 0, left: 0};
-			
+
 			// Approximates transform-origin, tx, and ty
 			var css = {
 				'position': cssPosition,
@@ -403,7 +403,7 @@
 			this.$elem.css(css);
 		}
 	};
-	
+
 	/**
 	 * Ensure that values have the appropriate units on them
 	 * @param string func
@@ -411,11 +411,11 @@
 	 */
 	function toPx(elem, val) {
 		var parts = rfxnum.exec($.trim(val));
-		
+
 		if (parts[3] && parts[3] !== 'px') {
 			var prop = 'paddingBottom',
 				orig = $.style( elem, prop );
-				
+
 			$.style( elem, prop, val );
 			val = cur( elem, prop );
 			$.style( elem, prop, orig );
@@ -423,7 +423,7 @@
 		}
 		return parseFloat( val );
 	}
-	
+
 	function cur(elem, prop) {
 		if ( elem[prop] != null && (!elem.style || elem.style[prop] == null) ) {
 			return elem[ prop ];
@@ -447,7 +447,7 @@
 		safeOuterHeight: function() {
 			return this.safeOuterLength('height');
 		},
-		
+
 		/**
 		 * @param void
 		 * @return Number
@@ -455,7 +455,7 @@
 		safeOuterWidth: function() {
 			return this.safeOuterLength('width');
 		},
-		
+
 		/**
 		 * Returns reliable outer dimensions for an object that may have been transformed.
 		 * Only use this if the matrix isn't handy
@@ -464,11 +464,11 @@
 		 */
 		safeOuterLength: function(dim) {
 			var funcName = 'outer' + (dim == 'width' ? 'Width' : 'Height');
-			
+
 			if (!$.support.csstransforms && $.browser.msie) {
 				// make the variables more generic
 				dim = dim == 'width' ? 'width' : 'height';
-				
+
 				// if we're transforming and have a matrix; we can shortcut.
 				// the true outerHeight is the transformed outerHeight divided by the ratio.
 				// the ratio is equal to the height of a 1px by 1px box that has been transformed by the same matrix.
@@ -478,38 +478,38 @@
 						ratio = calc.offset(),
 						length = this.$elem[funcName]() / ratio[dim];
 					this[funcName] = length;
-					
+
 					return length;
 				} else if (this.applyingMatrix && this[funcName]) {
 					// return the cached calculation
 					return this[funcName];
 				}
-				
-				// map dimensions to box sides			
+
+				// map dimensions to box sides
 				var side = {
 					height: ['top', 'bottom'],
 					width: ['left', 'right']
 				};
-				
+
 				// setup some variables
 				var elem = this.$elem[0],
 					outerLen = parseFloat($.curCSS(elem, dim, true)), //TODO: this can be cached on animations that do not animate height/width
 					boxSizingProp = this.boxSizingProperty,
 					boxSizingValue = this.boxSizingValue;
-				
+
 				// IE6 && IE7 will never have a box-sizing property, so fake it
 				if (!this.boxSizingProperty) {
 					boxSizingProp = this.boxSizingProperty = _findBoxSizingProperty() || 'box-sizing';
 					boxSizingValue = this.boxSizingValue = this.$elem.css(boxSizingProp) || 'content-box';
 				}
-				
+
 				// return it immediately if we already know it
 				if (this[funcName] && this[dim] == outerLen) {
 					return this[funcName];
 				} else {
 					this[dim] = outerLen;
 				}
-				
+
 				// add in the padding and border
 				if (boxSizingProp && (boxSizingValue == 'padding-box' || boxSizingValue == 'content-box')) {
 					outerLen += parseFloat($.curCSS(elem, 'padding-' + side[dim][0], true)) || 0 +
@@ -519,7 +519,7 @@
 					outerLen += parseFloat($.curCSS(elem, 'border-' + side[dim][0] + '-width', true)) || 0 +
 								  parseFloat($.curCSS(elem, 'border-' + side[dim][1] + '-width', true)) || 0;
 				}
-				
+
 				// remember and return the outerHeight
 				this[funcName] = outerLen;
 				return outerLen;
@@ -527,7 +527,7 @@
 			return this.$elem[funcName]();
 		}
 	});
-	
+
 	/**
 	 * Determine the correct property for checking the box-sizing property
 	 * @param void
@@ -537,8 +537,8 @@
 	function _findBoxSizingProperty () {
 		if (_boxSizingProperty) {
 			return _boxSizingProperty;
-		} 
-		
+		}
+
 		var property = {
 				boxSizing : 'box-sizing',
 				MozBoxSizing : '-moz-box-sizing',
@@ -546,7 +546,7 @@
 				OBoxSizing : '-o-box-sizing'
 			},
 			elem = document.body;
-		
+
 		for (var p in property) {
 			if (typeof elem.style[p] != 'undefined') {
 				_boxSizingProperty = property[p];

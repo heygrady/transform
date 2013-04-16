@@ -15,7 +15,7 @@
 	var $m = $.matrix,
 		$m2x2 = $m.M2x2,
 		$m3x3 = $m.M3x3;
-	
+
 	$.extend( $m, {
 		/**
 		 * Identity matrix
@@ -32,7 +32,7 @@
 			}
 			return new $m['M'+size+'x'+size](elements);
 		},
-		
+
 		/**
 		 * Matrix
 		 * @return Matrix
@@ -54,7 +54,7 @@
 					);
 			}
 		},
-		
+
 		/**
 		 * Reflect (same as rotate(180))
 		 * @return Matrix
@@ -65,18 +65,18 @@
 				 0, -1
 			);
 		},
-		
+
 		/**
 		 * Reflect across the x-axis (mirrored upside down)
 		 * @return Matrix
 		 */
-		reflectX: function() {	
+		reflectX: function() {
 			return new $m2x2(
 				1,  0,
 				0, -1
 			);
 		},
-		
+
 		/**
 		 * Reflect by swapping x an y (same as reflectX + rotate(-90))
 		 * @return Matrix
@@ -87,7 +87,7 @@
 				1, 0
 			);
 		},
-		
+
 		/**
 		 * Reflect across the y-axis (mirrored)
 		 * @return Matrix
@@ -98,7 +98,7 @@
 				 0, 1
 			);
 		},
-		
+
 		/**
 		 * Rotates around the origin
 		 * @param Number deg
@@ -110,18 +110,18 @@
 			var rad = $.angle.degreeToRadian(deg),
 				costheta = Math.cos(rad),
 				sintheta = Math.sin(rad);
-			
+
 			var a = costheta,
 				b = sintheta,
 				c = -sintheta,
 				d = costheta;
-				
+
 			return new $m2x2(
 				a, c,
 				b, d
 			);
 		},
-		
+
 		/**
 		 * Scale
 		 * @param Number sx
@@ -132,13 +132,13 @@
 		scale: function (sx, sy) {
 			sx = sx || sx === 0 ? sx : 1;
 			sy = sy || sy === 0 ? sy : sx;
-			
+
 			return new $m2x2(
 				sx, 0,
 				0, sy
 			);
 		},
-		
+
 		/**
 		 * Scale on the X-axis
 		 * @param Number sx
@@ -147,7 +147,7 @@
 		scaleX: function (sx) {
 			return $m.scale(sx, 1);
 		},
-		
+
 		/**
 		 * Scale on the Y-axis
 		 * @param Number sy
@@ -156,7 +156,7 @@
 		scaleY: function (sy) {
 			return $m.scale(1, sy);
 		},
-		
+
 		/**
 		 * Skews on the X-axis and Y-axis
 		 * @param Number degX
@@ -166,19 +166,19 @@
 		skew: function (degX, degY) {
 			degX = degX || 0;
 			degY = degY || 0;
-			
+
 			//TODO: detect units
 			var radX = $.angle.degreeToRadian(degX),
 				radY = $.angle.degreeToRadian(degY),
 				x = Math.tan(radX),
 				y = Math.tan(radY);
-			
+
 			return new $m2x2(
 				1, x,
 				y, 1
 			);
 		},
-		
+
 		/**
 		 * Skews on the X-axis
 		 * @param Number degX
@@ -188,7 +188,7 @@
 		skewX: function (degX) {
 			return $m.skew(degX);
 		},
-		
+
 		/**
 		 * Skews on the Y-axis
 		 * @param Number degY
@@ -198,7 +198,7 @@
 		skewY: function (degY) {
 			return $m.skew(0, degY);
 		},
-		
+
 		/**
 		 * Translate
 		 * @param Number tx
@@ -209,14 +209,14 @@
 		translate: function (tx, ty) {
 			tx = tx || 0;
 			ty = ty || 0;
-			
+
 			return new $m3x3(
 				1, 0, tx,
 				0, 1, ty,
 				0, 0, 1
 			);
 		},
-		
+
 		/**
 		 * Translate on the X-axis
 		 * @param Number tx
@@ -226,7 +226,7 @@
 		translateX: function (tx) {
 			return $m.translate(tx);
 		},
-		
+
 		/**
 		 * Translate on the Y-axis
 		 * @param Number ty

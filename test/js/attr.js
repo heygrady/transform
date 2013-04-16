@@ -12,7 +12,7 @@ $.extend($.transform.prototype, {
 		if (parts) {
 			var $elem = this.$elem,
 				transform = $elem.attr('data-transform');
-			
+
 			if (!transform) {
 				// it's empty, just save
 				$elem.attr('data-transform', func);
@@ -20,7 +20,7 @@ $.extend($.transform.prototype, {
 				// if we've already got it, replace it
 				var result = null,
 					string = '';
-					
+
 				// loop the funcs to replace
 				while ((result = rfunc.exec(transform)) != null) {
 					if (parts[1] == result[1]) {
@@ -36,7 +36,7 @@ $.extend($.transform.prototype, {
 			}
 		}
 	},
-	
+
 	/**
 	 * @param String func
 	 */
@@ -46,7 +46,7 @@ $.extend($.transform.prototype, {
 				transform = $elem.attr('data-transform'),
 				result = null,
 				string = '';
-			
+
 			if (transform && transform.indexOf(func) > -1) {
 				// loop the funcs to remove
 				while ((result = rfunc.exec(transform)) != null) {
@@ -54,7 +54,7 @@ $.extend($.transform.prototype, {
 						string += ' ' +  result[0];
 					}
 				}
-				
+
 				string = jQuery.trim(string);
 				if (!string) {
 					$elem.removeAttr('data-transform');
@@ -65,16 +65,16 @@ $.extend($.transform.prototype, {
 		} else {
 			this.$elem.removeAttr('data-transform');
 		}
-		
+
 	},
-	
+
 	/**
 	 * @param String func
 	 * @return bool
 	 */
 	hasTransform: function( func ) {
 		var transform = this.$elem.attr('data-transform');
-		
+
 		if (!transform) {
 			return false;
 		} else if (func && transform.indexOf(func) > -1) {
@@ -82,19 +82,19 @@ $.extend($.transform.prototype, {
 		}
 		return false;
 	},
-	
+
 	/**
 	 * @param String func
 	 * @param Array
 	 */
 	getTransform: function( func ) {
 		var transform = this.$elem.attr('data-transform');
-		
+
 		if (!transform) {
 		//	console.log('getTransform(' + func + ') =>', 'nothing');
 			return null;
 		}
-		
+
 		var result = null;
 		if (func && transform.indexOf(func) > -1) {
 			// return a specific value
@@ -118,7 +118,7 @@ $.extend($.transform.prototype, {
 		console.log(transform);
 		return null;
 	},
-	
+
 	/**
 	 * Clears out all of the custom attributed
 	 * @param void
@@ -126,7 +126,7 @@ $.extend($.transform.prototype, {
 	clearAttrs: function() {
 		this.$elem.attr('data-transform', '');
 	},
-	
+
 	/**
 	 * @param Object funcs a list of transform functions to store on this element
 	 * @return void
@@ -136,17 +136,17 @@ $.extend($.transform.prototype, {
 			value;
 		for (var func in funcs) {
 			value = funcs[func];
-			
+
 			// TODO: normalize values on px, deg, etc
 			if ($.isArray(value)) {
 				value = value.join(', ');
 			}
-			
+
 			string += ' ' + func + '(' + value + ')';
 		}
 		this.$elem.attr('data-transform', jQuery.trim(string));
 	},
-	
+
 	/**
 	 * @param string func name of a transform function
 	 * @param mixed value with proper units
@@ -157,17 +157,17 @@ $.extend($.transform.prototype, {
 		if ($.isArray(value)) {
 			value = value.join(', ');
 		}
-		
+
 		this.addTransform(func + '(' + value + ')'); //should be unitless
 	},
-	
+
 	/**
 	 * @return Object values with proper units
 	 */
 	getAttrs: function() {
 		return this.getTransform();
 	},
-	
+
 	/**
 	 * @param String func
 	 * @return Array of values
@@ -179,11 +179,11 @@ $.extend($.transform.prototype, {
 		var value = this.getTransform(func);
 		var rspace = /\s/;
 		var rperc = /%/;
-		
+
 		if (func == 'origin' && !value && value !== 0) {
 			// we can look up the origin in CSS
 			value = this.$elem.css(this.transformProperty + '-origin');
-			
+
 			//Moz reports the value in % if there hasn't been a transformation yet
 			if (rperc.test(value)) {
 				value = value.split(rspace);

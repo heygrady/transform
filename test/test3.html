@@ -3,14 +3,14 @@
 <head>
 	<meta charset="utf-8" />
 
-	<!-- Always force latest IE rendering engine (even in intranet) & Chrome Frame 
+	<!-- Always force latest IE rendering engine (even in intranet) & Chrome Frame
 			 Remove this if you use the .htaccess -->
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
 
 	<title>test3</title>
 	<link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/3.2.0/build/cssreset/reset-min.css">
 	<link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/3.2.0/build/cssfonts/fonts-min.css">
-	
+
 	<style>
 		#container {
 			padding: 10px;
@@ -57,9 +57,9 @@
 				<h2>Transform</h2>
 			</div>
 		</div>
-		
+
 		<div class="wrapper">
-			<img class="transform" src="http://www.doornpoort.co.za/wp-content/uploads/2009/12/cute-puppy-150x150.jpg" height="150" width="150" />	
+			<img class="transform" src="http://www.doornpoort.co.za/wp-content/uploads/2009/12/cute-puppy-150x150.jpg" height="150" width="150" />
 		</div>
 		<div class="wrapper">
 			<img class="transform" src="http://www.blogcdn.com/www.adjab.com/media/2006/04/kitten.jpg" height="150" width="150" />
@@ -68,8 +68,8 @@
 			<img class="transform" src="http://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Nuvola_apps_forward_arrow.svg/150px-Nuvola_apps_forward_arrow.svg.png" height="150" width="150" />
 		</div>
 	</div>
-	
-	
+
+
 	<!-- <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.js"></script> -->
 	<script src="js/jquery-1.4.3.js"></script>
 	<script src="../src/jquery.transform.js"></script>
@@ -79,7 +79,7 @@
 	<script src="../src/jquery.matrix.js"></script>
 	<script src="../src/jquery.matrix.calculations.js"></script>
 	<script src="../src/jquery.matrix.functions.js"></script>
-	
+
 	<script>
 	(function ($) {
 		var $elem = $('.transform:last'),
@@ -88,7 +88,7 @@
 			$step = $('#step'),
 			current = -1,
 			auto = false;
-		
+
 		//$('#go').click(go);
 		$('#prev').click(prev);
 		$('#next').click(next);
@@ -102,7 +102,7 @@
 			$step.text(current + '');
 			go();
 		}
-		
+
 		function go() {
 			var tests = [
 				// Matrix
@@ -159,7 +159,7 @@
 					$text.text('Reset');
 					$elem.transform({});
 				},
-					
+
 				// Reflect
 				function () {
 					$text.text('Transform: Reflect');
@@ -229,7 +229,7 @@
 					$text.text('Reset');
 					$elem.transform({});
 				},
-				
+
 				// Animate Reflect
 				function () {
 					$text.text('Animate: Reflect');
@@ -283,7 +283,7 @@
 					$text.text('Reset');
 					$elem.transform({});
 				},
-					
+
 				// Rotate
 				function () {
 					$text.text('Transform: Rotate');
@@ -317,7 +317,7 @@
 					$text.text('Reset');
 					$elem.transform({});
 				},
-					
+
 				// Scale
 				function () {
 					$text.text('Transform: Scale with one value');
@@ -371,7 +371,7 @@
 					$text.text('Reset');
 					$elem.transform({});
 				},
-					
+
 				// ScaleX and ScaleY
 				function () {
 					$text.text('Transform: ScaleX');
@@ -405,7 +405,7 @@
 					$text.text('Reset');
 					$elem.transform({});
 				},
-				
+
 				//Skew
 				function () {
 					$text.text('Transform: Skew with one value');
@@ -477,7 +477,7 @@
 					$text.text('Reset');
 					$elem.transform({});
 				},
-				
+
 				// SkewX and SkewY
 				function () {
 					$text.text('Transform: SkewX');
@@ -517,7 +517,7 @@
 					$text.text('Reset');
 					$elem.transform({});
 				},
-				
+
 				// Translate
 				function () {
 					$text.text('Transform: Translate with one value');
@@ -583,7 +583,7 @@
 					$text.text('Reset');
 					$elem.transform({});
 				},
-				
+
 				// TranslateX and TranslateY
 				function () {
 					$text.text('Transform: TranslateX');
@@ -629,7 +629,7 @@
 					$text.text('Reset');
 					$elem.transform({});
 				},
-				
+
 				// Origin
 				function () {
 					$text.text('Transform: Origin with one value');
@@ -696,20 +696,20 @@
 					$elem.transform({});
 				},
 			]
-			
+
 			if (tests[current]) {
 				tests[current]();
 			} else {
 				$text.text('Done!');
 				return;
 			}
-			
+
 			$result.text($elem.attr('data-transform'));
 			if (auto) {
 				next();
 			}
 		}
-		
+
 	})(jQuery);
 	</script>
 </body>

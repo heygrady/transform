@@ -10,7 +10,7 @@
 		var $el = $(this);
 		$el.animate({rotate: '+=360deg'});
 	});
-	
+
 	/**
 	 * cache the form fields
 	 * @var Object
@@ -43,14 +43,14 @@
 			x: $('#origin-x'),
 			y: $('#origin-y')
 		}
-	};	
-	
+	};
+
 	/**
 	 * Process the form
 	 */
 	function processForm() {
 		var funcs = {};
-		
+
 		for (var key in fields) {
 			var field = fields[key];
 			var val = null;
