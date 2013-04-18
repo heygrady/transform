@@ -1,5 +1,15 @@
+# NO LONGER MAINTAINED
+As a note, I'm no longer maintaining this library. There was a much simpler library by Louis Remi. I forked it a while back and ported over the portions of my library that were missing from his. Louis' approach is much simpler and more performant.
+
+My fork is [here](https://github.com/heygrady/jquery.transform.js)
+
+Louis Remi's is [here](https://github.com/louisremi/jquery.transform.js)
+
+
+
+
 # 2D Transformations
-This library uses native CSS3 transformations in supported browsers and relies on teh matrix filter in Internet Explorer 8 and below.
+This library uses native CSS3 transformations in supported browsers and relies on the matrix filter in Internet Explorer 8 and below.
 
 NOTE: In Internet Explorer 8 and below, the transform-origin and the translate functions are simulated using relative positioning. Because of this, in Internet Explorer 8 and below, the top and left position of an element will be incorrect after it has been transformed. The [solution](https://github.com/heygrady/transform/issues#issue/6) is to wrap the element that is to be transformed and position that wrapper instead.
 
