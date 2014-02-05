@@ -6,7 +6,7 @@
  * Dual licensed under the MIT or GPL Version 2 licenses.
  * http://jquery.org/license
  * 
- * Date: Sat Dec 4 15:46:09 2010 -0800
+ * Date: Wed Dec 19 13:27:21 2012 -0500
  */
 ///////////////////////////////////////////////////////
 // Transform
@@ -280,7 +280,7 @@
 				var matrixFilter = 'progid:DXImageTransform.Microsoft.Matrix(' +
 						'M11=' + a + ', M12=' + c + ', M21=' + b + ', M22=' + d +
 						', sizingMethod=\'auto expand\'' + filterType + ')';
-				var filter = style.filter || $.curCSS( this.$elem[0], "filter" ) || "";
+				var filter = style.filter || $.css( this.$elem[0], "filter" ) || "";
 				style.filter = rmatrix.test(filter) ? filter.replace(rmatrix, matrixFilter) : filter ? filter + ' ' + matrixFilter : matrixFilter;
 				
 				// Let's know that we're applying post matrix fixes and the height/width will be static for a bit
@@ -493,7 +493,7 @@
 				
 				// setup some variables
 				var elem = this.$elem[0],
-					outerLen = parseFloat($.curCSS(elem, dim, true)), //TODO: this can be cached on animations that do not animate height/width
+					outerLen = parseFloat($.css(elem, dim, true)), //TODO: this can be cached on animations that do not animate height/width
 					boxSizingProp = this.boxSizingProperty,
 					boxSizingValue = this.boxSizingValue;
 				
@@ -512,12 +512,12 @@
 				
 				// add in the padding and border
 				if (boxSizingProp && (boxSizingValue == 'padding-box' || boxSizingValue == 'content-box')) {
-					outerLen += parseFloat($.curCSS(elem, 'padding-' + side[dim][0], true)) || 0 +
-								  parseFloat($.curCSS(elem, 'padding-' + side[dim][1], true)) || 0;
+					outerLen += parseFloat($.css(elem, 'padding-' + side[dim][0], true)) || 0 +
+								  parseFloat($.css(elem, 'padding-' + side[dim][1], true)) || 0;
 				}
 				if (boxSizingProp && boxSizingValue == 'content-box') {
-					outerLen += parseFloat($.curCSS(elem, 'border-' + side[dim][0] + '-width', true)) || 0 +
-								  parseFloat($.curCSS(elem, 'border-' + side[dim][1] + '-width', true)) || 0;
+					outerLen += parseFloat($.css(elem, 'border-' + side[dim][0] + '-width', true)) || 0 +
+								  parseFloat($.css(elem, 'border-' + side[dim][1] + '-width', true)) || 0;
 				}
 				
 				// remember and return the outerHeight
@@ -830,9 +830,8 @@
 		var r = parseFloat( $.css( elem, prop ) );
 		return r && r > -10000 ? r : 0;
 	}
-	
-	var _custom = $.fx.prototype.custom;
-	$.fx.prototype.custom = function(from, to, unit) {
+
+	function customizeTween(from, to, unit) {
 		var multiple = $.cssMultipleValues[this.prop],
 			angle = $.cssAngle[this.prop];
 		
@@ -942,9 +941,27 @@
 				});				
 			});
 		}
-		return _custom.apply(this, arguments);
-	};
+	}
 	
+	
+	if ($.fx.prototype.custom) {
+		(function(prototype) {
+			var _custom = prototype.custom;
+			prototype.custom = function (from, to, unit) {
+			customizeTween.apply(this, arguments);
+				return _custom.apply(this, arguments);
+	    	};
+		}($.fx.prototype));
+	}
+	
+	// jQuery 1.8+ support
+	if ($.Animation && $.Animation.tweener) {
+		$.Animation.tweener($.transform.funcs.join(' '), function(prop, value) {
+		  var tween = this.createTween(prop, value);
+		  customizeTween.apply(tween, [tween.start, tween.end, tween.unit]);
+		  return tween;
+		});
+	}
 	/**
 	 * Animates a multi value attribute
 	 * @param Object fx
@@ -999,7 +1016,7 @@
 	 * Step for animating tranformations
 	 */
 	$.each($.transform.funcs, function(i, func) {
-		$.fx.step[func] = function(fx) {
+		function t(fx) {
 			var transform = fx.elem.transform || new $.transform(fx.elem),
 				funcs = {};
 			
@@ -1014,12 +1031,16 @@
 			}
 			
 			transform.exec(funcs, {preserve: true});
-		};
+		}
+		if ($.Tween && $.Tween.propHooks) {
+			$.Tween.propHooks[func] = { set: t };
+		}
+		if ($.fx.step) $.fx.step[func] = t;
 	});
 	
 	// Support matrix animation
 	$.each(['matrix', 'reflect', 'reflectX', 'reflectXY', 'reflectY'], function(i, func) {
-		$.fx.step[func] = function(fx) {
+		function t(fx) {
 			var transform = fx.elem.transform || new $.transform(fx.elem),
 				funcs = {};
 				
@@ -1057,7 +1078,11 @@
 			});
 			
 			transform.exec(funcs, {preserve: true});
-		};
+		}
+		if ($.Tween && $.Tween.propHooks) {
+			$.Tween.propHooks[func] = { set: t };
+		}
+		if ($.fx.step) $.fx.step[func] = t;
 	});
 })(jQuery, this, this.document);
 ///////////////////////////////////////////////////////
